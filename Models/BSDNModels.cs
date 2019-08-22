@@ -135,6 +135,7 @@ namespace BSDN_API.Models
                 .WithMany(t => t.ArticleTags)
                 .HasForeignKey(at => at.TagId);
 
+            // FK_Follower_UserFollow_Following
             modelBuilder.Entity<UserFollow>()
                 .HasKey(uf => new {uf.FollowerId, uf.FollowingId});
             modelBuilder.Entity<UserFollow>()

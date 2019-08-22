@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BSDN_API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class SessionController : ControllerBase
     {
+        // TODO:impl it
         // POST api/session
         [HttpPost]
         public void Post([FromBody] string value)
