@@ -17,6 +17,17 @@ namespace BSDN_API.Models
         public DateTime SignDate { set; get; }
 
         public List<Article> Articles { set; get; }
+        public List<UserFollow> UserFollowers { set; get; }
+        public List<UserFollow> UserFollowings { set; get; }
+    }
+
+    public class UserFollow
+    {
+        public int FollowerId { set; get; }
+        public User Follower { set; get; }
+
+        public int FollowingId { set; get; }
+        public User Following { set; get; }
     }
 
     public class Article
@@ -61,8 +72,7 @@ namespace BSDN_API.Models
         public string Content { set; get; }
         public DateTime PublishDate { set; get; }
 
-        //TODO: Reply
-        [NotMapped] public Comment ReplyComment { set; get; }
+        public Comment ReplyComment { set; get; }
 
         // FK_Article_Comment
         public Article Article { set; get; }
@@ -103,6 +113,11 @@ namespace BSDN_API.Models
                 .HasOne(c => c.Article)
                 .WithMany(a => a.Comments);
 
+            // Reply other comments
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.ReplyComment)
+                .WithMany();
+
             // FK_Article_ResourceFile
             modelBuilder.Entity<ResourceFile>()
                 .HasOne(rf => rf.Article)
@@ -119,6 +134,17 @@ namespace BSDN_API.Models
                 .HasOne(at => at.Tag)
                 .WithMany(t => t.ArticleTags)
                 .HasForeignKey(at => at.TagId);
+
+            modelBuilder.Entity<UserFollow>()
+                .HasKey(uf => new {uf.FollowerId, uf.FollowingId});
+            modelBuilder.Entity<UserFollow>()
+                .HasOne(uf => uf.Following)
+                .WithMany(fee => fee.UserFollowings)
+                .HasForeignKey(uf => uf.FollowingId);
+            modelBuilder.Entity<UserFollow>()
+                .HasOne(uf => uf.Follower)
+                .WithMany(fer => fer.UserFollowers)
+                .HasForeignKey(uf => uf.FollowerId);
         }
 
         // DbSet
