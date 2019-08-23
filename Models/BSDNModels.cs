@@ -140,7 +140,7 @@ namespace BSDN_API.Models
                 .HasKey(uf => new {uf.FollowerId, uf.FollowingId});
             modelBuilder.Entity<UserFollow>()
                 .HasOne(uf => uf.Following)
-                .WithMany(fee => fee.UserFollowings)
+                .WithMany(fg => fg.UserFollowings)
                 .HasForeignKey(uf => uf.FollowingId);
             modelBuilder.Entity<UserFollow>()
                 .HasOne(uf => uf.Follower)

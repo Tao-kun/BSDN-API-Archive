@@ -61,6 +61,30 @@ namespace BSDN_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserFollow",
+                columns: table => new
+                {
+                    FollowerId = table.Column<int>(nullable: false),
+                    FollowingId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserFollow", x => new { x.FollowerId, x.FollowingId });
+                    table.ForeignKey(
+                        name: "FK_UserFollow_Users_FollowerId",
+                        column: x => x.FollowerId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserFollow_Users_FollowingId",
+                        column: x => x.FollowingId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ArticleTag",
                 columns: table => new
                 {
@@ -92,6 +116,7 @@ namespace BSDN_API.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Content = table.Column<string>(nullable: true),
                     PublishDate = table.Column<DateTime>(nullable: false),
+                    ReplyCommentCommentId = table.Column<int>(nullable: true),
                     ArticleId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -102,6 +127,12 @@ namespace BSDN_API.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "ArticleId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Comments_Comments_ReplyCommentCommentId",
+                        column: x => x.ReplyCommentCommentId,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -141,9 +172,19 @@ namespace BSDN_API.Migrations
                 column: "ArticleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comments_ReplyCommentCommentId",
+                table: "Comments",
+                column: "ReplyCommentCommentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ResourceFiles_ArticleId",
                 table: "ResourceFiles",
                 column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserFollow_FollowingId",
+                table: "UserFollow",
+                column: "FollowingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -168,6 +209,9 @@ namespace BSDN_API.Migrations
 
             migrationBuilder.DropTable(
                 name: "ResourceFiles");
+
+            migrationBuilder.DropTable(
+                name: "UserFollow");
 
             migrationBuilder.DropTable(
                 name: "Tags");

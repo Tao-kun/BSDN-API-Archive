@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSDN_API.Migrations
 {
     [DbContext(typeof(BSDNContext))]
-    [Migration("20190822125637_Add reply of comment and Follow")]
-    partial class AddreplyofcommentandFollow
+    [Migration("20190823022823_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
