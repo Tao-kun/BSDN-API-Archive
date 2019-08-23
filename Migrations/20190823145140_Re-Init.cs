@@ -4,10 +4,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BSDN_API.Migrations
 {
-    public partial class Init : Migration
+    public partial class ReInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    SessionId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    SessionToken = table.Column<string>(maxLength: 512, nullable: true),
+                    ExpiresTime = table.Column<DateTime>(nullable: false),
+                    SessionUserId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.SessionId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Tags",
                 columns: table => new
@@ -85,7 +100,7 @@ namespace BSDN_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ArticleTag",
+                name: "ArticleTags",
                 columns: table => new
                 {
                     ArticleId = table.Column<int>(nullable: false),
@@ -93,15 +108,15 @@ namespace BSDN_API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ArticleTag", x => new { x.ArticleId, x.TagId });
+                    table.PrimaryKey("PK_ArticleTags", x => new { x.ArticleId, x.TagId });
                     table.ForeignKey(
-                        name: "FK_ArticleTag_Articles_ArticleId",
+                        name: "FK_ArticleTags_Articles_ArticleId",
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "ArticleId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ArticleTag_Tags_TagId",
+                        name: "FK_ArticleTags_Tags_TagId",
                         column: x => x.TagId,
                         principalTable: "Tags",
                         principalColumn: "TagId",
@@ -162,8 +177,8 @@ namespace BSDN_API.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArticleTag_TagId",
-                table: "ArticleTag",
+                name: "IX_ArticleTags_TagId",
+                table: "ArticleTags",
                 column: "TagId");
 
             migrationBuilder.CreateIndex(
@@ -180,6 +195,18 @@ namespace BSDN_API.Migrations
                 name: "IX_ResourceFiles_ArticleId",
                 table: "ResourceFiles",
                 column: "ArticleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_SessionToken",
+                table: "Sessions",
+                column: "SessionToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_TagName",
+                table: "Tags",
+                column: "TagName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserFollow_FollowingId",
@@ -202,13 +229,16 @@ namespace BSDN_API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ArticleTag");
+                name: "ArticleTags");
 
             migrationBuilder.DropTable(
                 name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "ResourceFiles");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "UserFollow");

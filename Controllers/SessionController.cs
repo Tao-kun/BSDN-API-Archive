@@ -5,9 +5,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using BSDN_API.Models;
-using Microsoft.AspNetCore.Internal;
 using Microsoft.EntityFrameworkCore;
+using BSDN_API.Models;
+using BSDN_API.Utils;
 
 namespace BSDN_API.Controllers
 {
@@ -51,7 +51,7 @@ namespace BSDN_API.Controllers
                 return BadRequest(result);
             }
 
-            string token = SessionUtils.GenerateSession(userResult);
+            string token = TokenUtils.GenerateSessionToken(userResult);
             Session session = new Session
             {
                 SessionToken = token,
@@ -65,7 +65,7 @@ namespace BSDN_API.Controllers
             return Ok(result);
         }
 
-        // DELETE api/session/5
+        // DELETE api/session?token={token}
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery(Name = "token")] string token)
         {
@@ -87,25 +87,9 @@ namespace BSDN_API.Controllers
 
             _context.Sessions.Remove(sessionResult);
             await _context.SaveChangesAsync();
-            result = new ModelResult<Session>(200, null, "Logout");
+            
+            result = new ModelResult<Session>(200, sessionResult, "Logout");
             return Ok(result);
-        }
-    }
-
-    public static class SessionUtils
-    {
-        public static string GenerateSession(User user)
-        {
-            var rawToken = user.Nickname + user.UserId + user.Email + DateTime.Now.ToString();
-            var md5 = MD5.Create();
-            var data = md5.ComputeHash(Encoding.UTF8.GetBytes(rawToken));
-            var stringBuilder = new StringBuilder();
-            foreach (var ch in data)
-            {
-                stringBuilder.Append(ch.ToString("x2"));
-            }
-
-            return stringBuilder.ToString();
         }
     }
 }

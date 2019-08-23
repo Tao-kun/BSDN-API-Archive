@@ -50,7 +50,7 @@ namespace BSDN_API.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("ArticleTag");
+                    b.ToTable("ArticleTags");
                 });
 
             modelBuilder.Entity("BSDN_API.Models.Comment", b =>
@@ -121,6 +121,9 @@ namespace BSDN_API.Migrations
                         .HasMaxLength(64);
 
                     b.HasKey("TagId");
+
+                    b.HasIndex("TagName")
+                        .IsUnique();
 
                     b.ToTable("Tags");
                 });
