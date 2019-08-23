@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using BSDN_API.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BSDN_API.Models
@@ -167,19 +165,5 @@ namespace BSDN_API.Models
         public DbSet<Comment> Comments { set; get; }
         public DbSet<ResourceFile> ResourceFiles { set; get; }
         public DbSet<Session> Sessions { set; get; }
-    }
-
-    public class ModelResult<T>
-    {
-        public int Status { set; get; }
-        public string Message { set; get; }
-        public T Data { set; get; }
-
-        public ModelResult(int status, T data,string message)
-        {
-            Status = status;
-            Data = data;
-            Message = message;
-        }
     }
 }

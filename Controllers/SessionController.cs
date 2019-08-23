@@ -5,9 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using BSDN_API.Models;
-using Microsoft.AspNetCore.Internal;
 using Microsoft.EntityFrameworkCore;
+using BSDN_API.Models;
 
 namespace BSDN_API.Controllers
 {
@@ -65,7 +64,7 @@ namespace BSDN_API.Controllers
             return Ok(result);
         }
 
-        // DELETE api/session/5
+        // DELETE api/session?token={token}
         [HttpDelete]
         public async Task<IActionResult> Delete([FromQuery(Name = "token")] string token)
         {
