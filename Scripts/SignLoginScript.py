@@ -6,8 +6,8 @@ headers = {'Content-type': 'application/json'}
 SALT="BSDN"
 
 user_data=dict(
-	email="test2@example.com",
-	nickname="Sims1"
+	email="test3@example.com",
+	nickname="Sims2"
 )
 
 password="example_password"
@@ -32,9 +32,9 @@ rjson=r.json()
 token=rjson['data']['sessionToken']
 
 # 退出
-r=requests.delete("http://127.0.0.1:5000/api/session?token={}".format(token))
-print(r.text)
-print(r.status_code)
+#r=requests.delete("http://127.0.0.1:5000/api/session?token={}".format(token))
+#print(r.text)
+#print(r.status_code)
 
 # 注销
 userId=rjson['data']['sessionUserId']

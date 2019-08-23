@@ -141,6 +141,10 @@ namespace BSDN_API.Models
                 .WithMany(t => t.ArticleTags)
                 .HasForeignKey(at => at.TagId);
 
+            modelBuilder.Entity<Tag>()
+                .HasIndex(t => t.TagName)
+                .IsUnique();
+
             // FK_Follower_UserFollow_Following
             modelBuilder.Entity<UserFollow>()
                 .HasKey(uf => new {uf.FollowerId, uf.FollowingId});
@@ -162,6 +166,7 @@ namespace BSDN_API.Models
         public DbSet<User> Users { set; get; }
         public DbSet<Article> Articles { set; get; }
         public DbSet<Tag> Tags { set; get; }
+        public DbSet<ArticleTag> ArticleTags { set; get; }
         public DbSet<Comment> Comments { set; get; }
         public DbSet<ResourceFile> ResourceFiles { set; get; }
         public DbSet<Session> Sessions { set; get; }

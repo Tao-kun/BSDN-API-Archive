@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSDN_API.Migrations
 {
     [DbContext(typeof(BSDNContext))]
-    [Migration("20190823032608_Fix Session")]
-    partial class FixSession
+    [Migration("20190823145140_Re-Init")]
+    partial class ReInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -52,7 +52,7 @@ namespace BSDN_API.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("ArticleTag");
+                    b.ToTable("ArticleTags");
                 });
 
             modelBuilder.Entity("BSDN_API.Models.Comment", b =>
@@ -123,6 +123,9 @@ namespace BSDN_API.Migrations
                         .HasMaxLength(64);
 
                     b.HasKey("TagId");
+
+                    b.HasIndex("TagName")
+                        .IsUnique();
 
                     b.ToTable("Tags");
                 });

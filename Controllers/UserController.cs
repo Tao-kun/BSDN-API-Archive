@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BSDN_API.Models;
+using BSDN_API.Utils;
 
 namespace BSDN_API.Controllers
 {
@@ -25,7 +26,7 @@ namespace BSDN_API.Controllers
         // GET api/user?start={start user index}&offset={offset}&sort={sort type id}&keyword={keyword}
         // TODO: 搜索
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get(
+        public async Task<IActionResult> Get(
             [FromQuery(Name = "start")] int start,
             [FromQuery(Name = "offset")] int offset)
         {
@@ -36,19 +37,19 @@ namespace BSDN_API.Controllers
                 offset = 20;
             }
 
-            List<User> users = _context.Users.ToList();
-            // TODO: hasnext
+            List<User> users = await _context.Users.ToListAsync();
+            // TODO: has next
             bool hasNext = false;
             if (users.Count == 0)
             {
-                result = new ModelResultList<User>(404, users, "No User Exists", false);
-                return Ok(result);
+                result = new ModelResultList<User>(404, users, "No User Exists", hasNext);
             }
             else
             {
                 result = new ModelResultList<User>(200, users, null, hasNext);
-                return Ok(result);
             }
+
+            return Ok(result);
         }
 
         // GET api/user/{user id}
@@ -91,61 +92,70 @@ namespace BSDN_API.Controllers
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            result = new ModelResult<User>(201, user, "Created");
+            result = new ModelResult<User>(201, user, "User Created");
             return Ok(result);
         }
 
         // PUT api/user/{user id}?token={token}
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, User user)
+        public async Task<IActionResult> Put(
+            int id,
+            [FromBody] User user,
+            [FromQuery(Name = "token")] string token)
         {
-            // TODO: impl it and add result
+            ModelResult<User> result = TokenUtils.CheckToken<User>(token, _context);
+            if (result != null)
+            {
+                return BadRequest(result);
+            }
+
+            User userResult = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == id);
+            Session sessionResult = await _context.Sessions
+                .FirstOrDefaultAsync(s => s.SessionToken == token);
+            if (userResult == null || userResult.UserId != sessionResult.SessionUserId)
+            {
+                result = new ModelResult<User>(405, null, "User Not Exists or Token not suit");
+                return BadRequest(result);
+            }
+
             if (id != user.UserId)
             {
-                return BadRequest();
+                result = new ModelResult<User>(405, null, "Cannot Modify UserId");
+                return BadRequest(result);
             }
 
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
-            return Ok();
+
+            result = new ModelResult<User>(200, null, "User Modified");
+            return Ok(result);
         }
 
         // DELETE api/user/{user id}?token={token}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id, [FromQuery(Name = "token")] string token)
         {
-            ModelResult<User> result;
-            if (token == null)
+            ModelResult<User> result = TokenUtils.CheckToken<User>(token, _context);
+            if (result != null)
             {
-                result = new ModelResult<User>(405, null, "");
-                return BadRequest(new JsonResult(result));
-            }
-
-            Session session = await _context.Sessions
-                .FirstOrDefaultAsync(s => s.SessionToken == token);
-            if (session == null)
-            {
-                result = new ModelResult<User>(404, null, "Token Not Exists");
-                return BadRequest(result);
-            }
-
-            if (session.ExpiresTime < DateTime.Now)
-            {
-                result = new ModelResult<User>(405, null, "Token Expires");
                 return BadRequest(result);
             }
 
             User userResult = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserId == id);
-            if (userResult == null || userResult.UserId != session.SessionUserId)
+            Session sessionResult = await _context.Sessions
+                .FirstOrDefaultAsync(s => s.SessionToken == token);
+            if (userResult == null || userResult.UserId != sessionResult.SessionUserId)
             {
-                result = new ModelResult<User>(404, null, "User Not Exists or Token not suit");
+                result = new ModelResult<User>(405, null, "User Not Exists or Token not suit");
                 return BadRequest(result);
             }
 
             _context.Users.Remove(userResult);
             await _context.SaveChangesAsync();
-            result = new ModelResult<User>(200, null, "User Deleted");
+
+            result = new ModelResult<User>(200, userResult, "User Deleted");
             return Ok(result);
         }
     }
