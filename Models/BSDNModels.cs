@@ -87,6 +87,14 @@ namespace BSDN_API.Models
         public Article Article { set; get; }
     }
 
+    public class Session
+    {
+        public int SessionId { set; get; }
+        [MaxLength(512)] public string SessionToken { set; get; }
+        public DateTime ExpiresTime { set; get; }
+        public int SessionUserId { set; get; }
+    }
+
     public class BSDNContext : DbContext
     {
         public BSDNContext(DbContextOptions<BSDNContext> options) : base(options)
@@ -146,6 +154,10 @@ namespace BSDN_API.Models
                 .HasOne(uf => uf.Follower)
                 .WithMany(fer => fer.UserFollowers)
                 .HasForeignKey(uf => uf.FollowerId);
+
+            modelBuilder.Entity<Session>()
+                .HasIndex(s => s.SessionToken)
+                .IsUnique();
         }
 
         // DbSet
@@ -154,5 +166,20 @@ namespace BSDN_API.Models
         public DbSet<Tag> Tags { set; get; }
         public DbSet<Comment> Comments { set; get; }
         public DbSet<ResourceFile> ResourceFiles { set; get; }
+        public DbSet<Session> Sessions { set; get; }
+    }
+
+    public class ModelResult<T>
+    {
+        public int Status { set; get; }
+        public string Message { set; get; }
+        public T Data { set; get; }
+
+        public ModelResult(int status, T data,string message)
+        {
+            Status = status;
+            Data = data;
+            Message = message;
+        }
     }
 }

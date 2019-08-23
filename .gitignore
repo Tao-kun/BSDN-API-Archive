@@ -31,3 +31,6 @@ msbuild.wrn
 
 # JetBrains Rider
 .idea/
+
+# User modified
+Scripts/

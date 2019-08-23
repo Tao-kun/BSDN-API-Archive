@@ -3,14 +3,16 @@ using System;
 using BSDN_API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BSDN_API.Migrations
 {
     [DbContext(typeof(BSDNContext))]
-    partial class BSDNContextModelSnapshot : ModelSnapshot
+    [Migration("20190823030229_Session Token")]
+    partial class SessionToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,6 +111,8 @@ namespace BSDN_API.Migrations
                     b.HasIndex("SessionToken")
                         .IsUnique();
 
+                    b.HasIndex("SessionUserId");
+
                     b.ToTable("Sessions");
                 });
 
@@ -201,6 +205,14 @@ namespace BSDN_API.Migrations
                     b.HasOne("BSDN_API.Models.Article", "Article")
                         .WithMany("ResourceFiles")
                         .HasForeignKey("ArticleId");
+                });
+
+            modelBuilder.Entity("BSDN_API.Models.Session", b =>
+                {
+                    b.HasOne("BSDN_API.Models.User", "SessionUser")
+                        .WithMany("Sessions")
+                        .HasForeignKey("SessionUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BSDN_API.Models.UserFollow", b =>
