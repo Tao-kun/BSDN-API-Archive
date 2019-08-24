@@ -131,7 +131,9 @@ namespace BSDN_API.Controllers
 
         // POST api/article?token={token}
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Article article, [FromQuery(Name = "token")] string token)
+        public async Task<IActionResult> Post(
+            [FromBody] Article article, 
+            [FromQuery(Name = "token")] string token)
         {
             ModelResult<Article> result = TokenUtils.CheckToken<Article>(token, _context);
             if (result != null)
@@ -235,7 +237,9 @@ namespace BSDN_API.Controllers
 
         // DELETE api/article/{id}?token={token}
         [HttpDelete("id")]
-        public async Task<IActionResult> Delete(int id, [FromQuery(Name = "token")] string token)
+        public async Task<IActionResult> Delete(
+            int id, 
+            [FromQuery(Name = "token")] string token)
         {
             ModelResult<Article> result = TokenUtils.CheckToken<Article>(token, _context);
             if (result != null)

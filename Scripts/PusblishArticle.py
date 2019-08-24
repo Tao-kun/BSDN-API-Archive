@@ -16,7 +16,7 @@ user_data["passwordHash"]=str(passwordHash.digest().hex())
 
 article_data=dict(
 	title="Hello, World 4",
-	content=r"This is the 4th article of this system\nWith a \\n signature\nAnd a markdown image url ![Google Logo](\"https://www.google.co.jp/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png\")"
+	content="This is the 4th article of this system\nWith a \\n signature\nAnd a markdown image url ![Google Logo](\"https://www.google.co.jp/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png\")"
 )
 
 
@@ -28,7 +28,6 @@ print(r.status_code)
 rjson=r.json()
 token=rjson['data']['sessionToken']
 userId=rjson['data']['sessionUserId']
-
 
 r=requests.post("http://127.0.0.1:5000/api/article?token={}".format(token),headers=headers,data=json.dumps(article_data))
 print(r.text)

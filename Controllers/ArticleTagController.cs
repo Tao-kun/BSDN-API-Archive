@@ -25,7 +25,10 @@ namespace BSDN_API.Controllers
 
         // POST api/article/{article id}/tag/{tag id}?token={token}
         [HttpPost]
-        public async Task<IActionResult> Post(int articleId, int tagId, [FromQuery(Name = "token")] string token)
+        public async Task<IActionResult> Post(
+            int articleId,
+            int tagId,
+            [FromQuery(Name = "token")] string token)
         {
             // 先检查Token、文章、tag是否存在且有效
             // 再检查Token拥有者和文章作者是否一人
@@ -78,7 +81,10 @@ namespace BSDN_API.Controllers
 
         // DELETE api/article/{article id}/tag/{tag id}?token={token}
         [HttpDelete]
-        public async Task<IActionResult> Delete(int articleId, int tagId, [FromQuery(Name = "token")] string token)
+        public async Task<IActionResult> Delete(
+            int articleId,
+            int tagId,
+            [FromQuery(Name = "token")] string token)
         {
             ModelResult<ArticleTag> result = TokenUtils.CheckToken<ArticleTag>(token, _context);
 
