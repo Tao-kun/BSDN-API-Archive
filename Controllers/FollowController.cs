@@ -19,7 +19,7 @@ namespace BSDN_API.Controllers
             _context = context;
         }
 
-        // GET api/follow?id={user id}&start=<start index>&offset=<offset>
+        // GET api/follow?id={user id}&offset=<offset>&limit={limit}
         // POST api/follow?token={token}
         // PUT api/follow?token={token}
         // DELETE api/follow/{user id}?token={token}

@@ -19,7 +19,7 @@ namespace BSDN_API.Controllers
             _context = context;
         }
 
-        // GET api/comment?id={article id}&start={start index index}&offset={offset}
+        // GET api/comment?id={article id}&offset={offset}&limit={limit}
         // POST api/comment?token={token}
         // POST api/comment/{comment id}?token={token}
         // DELETE api/comment/{comment id}?token={token}

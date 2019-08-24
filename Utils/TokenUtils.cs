@@ -38,7 +38,6 @@ namespace BSDN_API.Utils
                 {
                     result = new ModelResult<T>(405, default, "Token Not Exists");
                 }
-
                 else if (session.ExpiresTime < DateTime.Now)
                 {
                     result = new ModelResult<T>(405, default, "Token Expires");

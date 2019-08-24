@@ -23,30 +23,43 @@ namespace BSDN_API.Controllers
             _context = context;
         }
 
-        // GET api/user?start={start user index}&offset={offset}&sort={sort type id}&keyword={keyword}
+        // GET api/user?offset={offset}&limit={limit}&sort={sort type id}&keyword={keyword}
         // TODO: 搜索
         [HttpGet]
         public async Task<IActionResult> Get(
-            [FromQuery(Name = "start")] int start,
-            [FromQuery(Name = "offset")] int offset)
+            [FromQuery(Name = "offset")] int offset,
+            [FromQuery(Name = "limit")] int limit)
         {
-            ModelResultList<User> result;
-            // TODO: 分页
-            if (offset == 0)
+            ModelResultList<UserInfo> result;
+            if (limit == 0)
             {
-                offset = 20;
+                limit = 20;
             }
 
-            List<User> users = await _context.Users.ToListAsync();
-            // TODO: has next
-            bool hasNext = false;
-            if (users.Count == 0)
+            List<UserInfo> userInfos = await _context.Users.Select(u => new UserInfo(u)).ToListAsync();
+            int totalCount = userInfos.Count;
+            bool hasNext = offset + limit < totalCount;
+
+            if (offset < totalCount)
             {
-                result = new ModelResultList<User>(404, users, "No User Exists", hasNext);
+                if (offset + limit > totalCount)
+                    limit = totalCount - offset;
+                userInfos = userInfos.GetRange(offset, limit);
             }
             else
             {
-                result = new ModelResultList<User>(200, users, null, hasNext);
+                result = new ModelResultList<UserInfo>(
+                    400, null, "Index Out of Index", false, totalCount);
+                return BadRequest(result);
+            }
+
+            if (userInfos.Count == 0)
+            {
+                result = new ModelResultList<UserInfo>(404, userInfos, "No User Exists", hasNext, totalCount);
+            }
+            else
+            {
+                result = new ModelResultList<UserInfo>(200, userInfos, null, hasNext, totalCount);
             }
 
             return Ok(result);

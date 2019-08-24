@@ -31,11 +31,11 @@ namespace BSDN_API.Controllers
             List<Tag> tagResult = await _context.Tags.ToListAsync();
             if (tagResult.Count == 0)
             {
-                result = new ModelResultList<Tag>(404, tagResult, "No Tag Exists", false);
+                result = new ModelResultList<Tag>(404, tagResult, "No Tag Exists", false, 0);
             }
             else
             {
-                result = new ModelResultList<Tag>(200, tagResult, null, false);
+                result = new ModelResultList<Tag>(200, tagResult, null, false, tagResult.Count);
             }
 
             return Ok(result);
