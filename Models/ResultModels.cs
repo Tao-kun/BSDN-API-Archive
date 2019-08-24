@@ -23,7 +23,7 @@ namespace BSDN_API.Models
         public string Message { set; get; }
         public List<T> Data { set; get; }
         public bool HasNext { set; get; }
-        public int Count { set; get; }
+        public int TotalCount { set; get; }
 
         public ModelResultList(int status, List<T> data, string message, bool hasNext, int count)
         {
@@ -31,7 +31,7 @@ namespace BSDN_API.Models
             Data = data;
             Message = message;
             HasNext = hasNext;
-            Count = count;
+            TotalCount = count;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace BSDN_API.Models
         public string Content { set; get; }
         public DateTime PublishDate { set; get; }
 
-        public List<Tag> Tags { set; get; }
+        public List<TagInfo> TagInfos { set; get; }
         public int CommentCount { set; get; }
         public int ResourceFileCount { set; get; }
 
@@ -59,13 +59,13 @@ namespace BSDN_API.Models
             PublishDate = article.PublishDate;
             if (article.ArticleTags == null)
             {
-                Tags = null;
+                TagInfos = null;
             }
             else
             {
-                Tags = article.ArticleTags.Select(
+                TagInfos = article.ArticleTags.Select(
                     at => context.Tags.FirstOrDefault(t => t.TagId == at.TagId)
-                ).ToList();
+                ).Select(t => new TagInfo(t)).ToList();
             }
 
             CommentCount = article.Comments?.Count ?? 0;
@@ -75,25 +75,6 @@ namespace BSDN_API.Models
         }
     }
 
-    public class ArticleTag
-    {
-        // 多对多
-        // FK_Article_ArticleTag
-        public int ArticleId { set; get; }
-        public Article Article { set; get; }
-
-        // FK_Tag_ArticleTag
-        public int TagId { set; get; }
-        public Tag Tag { set; get; }
-    }
-
-    public class Tag
-    {
-        public int TagId { set; get; }
-        [MaxLength(64)] public string TagName { set; get; }
-
-        public List<ArticleTag> ArticleTags { set; get; }
-    }
 
     public class Comment
     {

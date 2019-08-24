@@ -40,6 +40,10 @@ namespace BSDN_API.Controllers
             {
                 limit = 20;
             }
+            else if (limit < 0)
+            {
+                limit = 0;
+            }
 
             IQueryable<Article> articleQuery;
 
@@ -86,10 +90,18 @@ namespace BSDN_API.Controllers
 
             if (articleInfos.Count == 0)
             {
-                result = new ModelResultList<ArticleInfo>(404, articleInfos, "No Article Exists", hasNext, totalCount);
+                result = new ModelResultList<ArticleInfo>(404, null, "No Article Exists", hasNext, totalCount);
             }
             else
             {
+                articleInfos = articleInfos
+                    .Select(ai =>
+                    {
+                        ai.TagInfos = _context.ArticleTags
+                            .Where(at => at.ArticleId == ai.ArticleId)
+                            .Select(at => new TagInfo(at.Tag)).ToList();
+                        return ai;
+                    }).ToList();
                 result = new ModelResultList<ArticleInfo>(200, articleInfos, null, hasNext, totalCount);
             }
 
@@ -195,9 +207,19 @@ namespace BSDN_API.Controllers
                 article.ViewNumber = articleResult.ViewNumber;
             }
 
-            if (article.Comments == null)
+            if (article.Comments == null || article.Comments.Count == 0)
             {
                 article.Comments = articleResult.Comments;
+            }
+
+            if (article.ArticleTags == null || article.ArticleTags.Count == 0)
+            {
+                article.ArticleTags = articleResult.ArticleTags;
+            }
+
+            if (article.ResourceFiles == null || article.ResourceFiles.Count == 0)
+            {
+                article.ResourceFiles = articleResult.ResourceFiles;
             }
 
             _context.Entry(article).State = EntityState.Modified;

@@ -35,6 +35,10 @@ namespace BSDN_API.Controllers
             {
                 limit = 20;
             }
+            else if (limit < 0)
+            {
+                limit = 0;
+            }
 
             List<UserInfo> userInfos = await _context.Users.Select(u => new UserInfo(u)).ToListAsync();
             int totalCount = userInfos.Count;
@@ -55,7 +59,7 @@ namespace BSDN_API.Controllers
 
             if (userInfos.Count == 0)
             {
-                result = new ModelResultList<UserInfo>(404, userInfos, "No User Exists", hasNext, totalCount);
+                result = new ModelResultList<UserInfo>(404, null, "No User Exists", hasNext, totalCount);
             }
             else
             {

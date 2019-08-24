@@ -23,6 +23,24 @@ namespace BSDN_API.Controllers
             _context = context;
         }
 
+        // GET api/session?token={token}
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery(Name = "token")] string token)
+        {
+            ModelResult<Session> result;
+            Session sessionResult = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionToken == token);
+            if (sessionResult == null)
+            {
+                result = new ModelResult<Session>(404, null, "Token Not Exists");
+                return BadRequest(result);
+            }
+            else
+            {
+                result = new ModelResult<Session>(200, sessionResult, null);
+                return Ok(result);
+            }
+        }
+
         // POST api/session
         [HttpPost]
         public async Task<IActionResult> Post(User user)
@@ -51,7 +69,14 @@ namespace BSDN_API.Controllers
                 return BadRequest(result);
             }
 
-            string token = TokenUtils.GenerateSessionToken(userResult);
+            string token;
+            for (;;)
+            {
+                token = TokenUtils.GenerateSessionToken(userResult, _context);
+                if (token != null)
+                    break;
+            }
+
             Session session = new Session
             {
                 SessionToken = token,
@@ -63,6 +88,28 @@ namespace BSDN_API.Controllers
 
             result = new ModelResult<Session>(201, session, "Session Created");
             return Ok(result);
+        }
+
+        // PUT api/session?token={token}
+        [HttpPut]
+        public async Task<IActionResult> Put([FromQuery(Name = "token")] string token)
+        {
+            ModelResult<Session> result;
+            Session sessionResult = await _context.Sessions.FirstOrDefaultAsync(s => s.SessionToken == token);
+            if (sessionResult == null)
+            {
+                result = new ModelResult<Session>(404, null, "Token Not Exists");
+                return BadRequest(result);
+            }
+            else
+            {
+                sessionResult.ExpiresTime = DateTime.Now.AddDays(1);
+                _context.Entry(sessionResult).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
+                result = new ModelResult<Session>(200, sessionResult, null);
+                return Ok(result);
+            }
         }
 
         // DELETE api/session?token={token}
@@ -87,7 +134,7 @@ namespace BSDN_API.Controllers
 
             _context.Sessions.Remove(sessionResult);
             await _context.SaveChangesAsync();
-            
+
             result = new ModelResult<Session>(200, sessionResult, "Logout");
             return Ok(result);
         }

@@ -27,18 +27,44 @@ namespace BSDN_API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            ModelResultList<Tag> result;
-            List<Tag> tagResult = await _context.Tags.ToListAsync();
+            ModelResultList<TagInfo> result;
+            List<TagInfo> tagResult = _context.Tags.ToList()
+                .Select(t =>
+                {
+                    t.ArticleTags = _context.ArticleTags
+                        .Where(at => at.TagId == t.TagId).ToList();
+                    return t;
+                })
+                .Select(t => new TagInfo(t)).ToList();
             if (tagResult.Count == 0)
             {
-                result = new ModelResultList<Tag>(404, tagResult, "No Tag Exists", false, 0);
+                result = new ModelResultList<TagInfo>(404, null, "No Tag Exists", false, 0);
             }
             else
             {
-                result = new ModelResultList<Tag>(200, tagResult, null, false, tagResult.Count);
+                result = new ModelResultList<TagInfo>(200, tagResult, null, false, tagResult.Count);
             }
 
             return Ok(result);
+        }
+
+        // TODO: GET api/tag/{tag id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            ModelResult<TagInfo> result;
+            Tag tagResult = await _context.Tags.FirstOrDefaultAsync(t => t.TagId == id);
+            if (tagResult == null)
+            {
+                result = new ModelResult<TagInfo>(404, null, "Tag Not Exists");
+                return BadRequest(result);
+            }
+            else
+            {
+                tagResult.ArticleTags = _context.ArticleTags.Where(at => at.TagId == tagResult.TagId).ToList();
+                result = new ModelResult<TagInfo>(200, new TagInfo(tagResult), null);
+                return Ok(result);
+            }
         }
 
         // POST api/tag?token={token}
