@@ -7,7 +7,7 @@ headers = {'Content-type': 'application/json'}
 SALT = "BSDN"
 
 user_data = dict(
-    email="test5@example.com",
+    email="test2@example.com",
     nickname="Sammy"
 )
 password = "example_password"
@@ -15,7 +15,6 @@ passwordHash = hashlib.md5("{}{}".format(password, SALT).encode())
 user_data["passwordHash"] = str(passwordHash.digest().hex())
 # print(passwordHash.digest().hex())
 
-tagNameList = ["C", "C++", "C#", "Java"]
 
 r = requests.post("http://127.0.0.1:5000/api/session", headers=headers, data=json.dumps(user_data))
 print(r.text)
@@ -25,7 +24,7 @@ rjson = r.json()
 token = rjson['data']['sessionToken']
 userId = rjson['data']['sessionUserId']
 
-at_list = [(4, 1), (4, 2), (5, 3), (5, 4)]
+at_list = [(1, 4), (2, 3), (3, 2), (4, 1),(1,2)]
 
 # add
 for t in at_list:

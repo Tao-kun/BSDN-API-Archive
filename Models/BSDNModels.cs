@@ -40,7 +40,7 @@ namespace BSDN_API.Models
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Article)
                 .WithMany(a => a.Comments)
-                .HasForeignKey(c=>c.ArticleId);
+                .HasForeignKey(c => c.ArticleId);
 
             // Reply other comments
             modelBuilder.Entity<Comment>()
@@ -51,7 +51,7 @@ namespace BSDN_API.Models
             modelBuilder.Entity<ResourceFile>()
                 .HasOne(rf => rf.Article)
                 .WithMany(a => a.ResourceFiles)
-                .HasForeignKey(rf=>rf.ArticleId);
+                .HasForeignKey(rf => rf.ArticleId);
 
             // FK_Article_ArticleTag_Tag
             modelBuilder.Entity<ArticleTag>()
@@ -94,5 +94,6 @@ namespace BSDN_API.Models
         public DbSet<Comment> Comments { set; get; }
         public DbSet<ResourceFile> ResourceFiles { set; get; }
         public DbSet<Session> Sessions { set; get; }
+        public DbSet<UserFollow> UserFollows { set; get; }
     }
 }

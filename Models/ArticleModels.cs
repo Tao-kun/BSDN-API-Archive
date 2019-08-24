@@ -15,7 +15,6 @@ namespace BSDN_API.Models
         string Content { set; get; }
         DateTime PublishDate { set; get; }
         int UserId { set; get; }
-        User User { set; get; }
     }
 
     public class Article
@@ -48,7 +47,7 @@ namespace BSDN_API.Models
         public int ResourceFileCount { set; get; }
 
         public int UserId { set; get; }
-        public User User { set; get; }
+        public string NickName { set; get; }
 
         public ArticleInfo(Article article, BSDNContext context)
         {
@@ -71,7 +70,7 @@ namespace BSDN_API.Models
             CommentCount = article.Comments?.Count ?? 0;
             ResourceFileCount = article.ResourceFiles?.Count ?? 0;
             UserId = article.UserId;
-            User = article.User;
+            NickName = article.User.Nickname;
         }
     }
 

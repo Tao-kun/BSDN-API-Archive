@@ -58,10 +58,28 @@ namespace BSDN_API.Models
 
     public class UserFollow
     {
+        // 主动方、关注者
         public int FollowerId { set; get; }
         public User Follower { set; get; }
 
+        // 被动方、被关注者
         public int FollowingId { set; get; }
         public User Following { set; get; }
+    }
+
+    public class UserFollowInfo
+    {
+        public int UserId { set; get; }
+        public string NickName { set; get; }
+        public int FollowerCount { set; get; }
+        public int FollowingCount { set; get; }
+
+        public UserFollowInfo(User user)
+        {
+            UserId = user.UserId;
+            NickName = user.Nickname;
+            FollowerCount = default;
+            FollowingCount = default;
+        }
     }
 }

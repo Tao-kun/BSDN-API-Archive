@@ -6,8 +6,8 @@ headers = {'Content-type': 'application/json'}
 SALT="BSDN"
 
 user_data=dict(
-	email="test5@example.com",
-	nickname="Sammy"
+	email="test1@example.com",
+	nickname="Sim"
 )
 password="example_password"
 passwordHash=hashlib.md5("{}{}".format(password,SALT).encode())
@@ -15,8 +15,8 @@ user_data["passwordHash"]=str(passwordHash.digest().hex())
 #print(passwordHash.digest().hex())
 
 article_data=dict(
-	title="Hello, World 5",
-	content=r"This is the 5th article of this system\n\nIt has three parts\n\nWith a image markdown url ![Baidu Logo](https://www.baidu.com/img/bd_logo1.png)"
+	title="Hello, World 4",
+	content=r"This is the 4th article of this system\nWith a \\n signature\nAnd a markdown image url ![Google Logo](\"https://www.google.co.jp/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png\")"
 )
 
 

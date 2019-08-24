@@ -29,7 +29,7 @@ namespace BSDN_API.Migrations
                     b.Property<string>("Title")
                         .HasMaxLength(256);
 
-                    b.Property<int?>("UserId");
+                    b.Property<int>("UserId");
 
                     b.Property<int>("ViewNumber");
 
@@ -58,7 +58,7 @@ namespace BSDN_API.Migrations
                     b.Property<int>("CommentId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("ArticleId");
+                    b.Property<int>("ArticleId");
 
                     b.Property<string>("Content");
 
@@ -80,7 +80,7 @@ namespace BSDN_API.Migrations
                     b.Property<int>("ResourceFileId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("ArticleId");
+                    b.Property<int>("ArticleId");
 
                     b.Property<string>("Filename")
                         .HasMaxLength(512);
@@ -165,14 +165,15 @@ namespace BSDN_API.Migrations
 
                     b.HasIndex("FollowingId");
 
-                    b.ToTable("UserFollow");
+                    b.ToTable("UserFollows");
                 });
 
             modelBuilder.Entity("BSDN_API.Models.Article", b =>
                 {
                     b.HasOne("BSDN_API.Models.User", "User")
                         .WithMany("Articles")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BSDN_API.Models.ArticleTag", b =>
@@ -192,7 +193,8 @@ namespace BSDN_API.Migrations
                 {
                     b.HasOne("BSDN_API.Models.Article", "Article")
                         .WithMany("Comments")
-                        .HasForeignKey("ArticleId");
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BSDN_API.Models.Comment", "ReplyComment")
                         .WithMany()
@@ -203,7 +205,8 @@ namespace BSDN_API.Migrations
                 {
                     b.HasOne("BSDN_API.Models.Article", "Article")
                         .WithMany("ResourceFiles")
-                        .HasForeignKey("ArticleId");
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BSDN_API.Models.UserFollow", b =>

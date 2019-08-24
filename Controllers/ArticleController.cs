@@ -70,12 +70,17 @@ namespace BSDN_API.Controllers
                     .Where(a => a.ArticleTags.Exists(at => at.TagId == tagId));
             }
 
-            List<ArticleInfo> articleInfos =
-                await articleQuery.Select(a => new ArticleInfo(a, _context)).ToListAsync();
+            List<ArticleInfo> articleInfos = articleQuery.ToList()
+                .Select(a =>
+                {
+                    a.User = _context.Users.FirstOrDefault(u => u.UserId == a.UserId);
+                    return a;
+                })
+                .Select(a => new ArticleInfo(a, _context)).ToList();
             int totalCount = articleInfos.Count;
             bool hasNext = offset + limit < totalCount;
 
-            if (offset < totalCount)
+            if (offset <= totalCount)
             {
                 if (offset + limit > totalCount)
                     limit = totalCount - offset;
@@ -83,8 +88,7 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                result = new ModelResultList<ArticleInfo>(
-                    400, null, "Index Out of Index", false, totalCount);
+                result = new ModelResultList<ArticleInfo>(400, null, "Index Out of Limit", false, totalCount);
                 return BadRequest(result);
             }
 

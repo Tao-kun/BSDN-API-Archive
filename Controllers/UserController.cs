@@ -44,7 +44,7 @@ namespace BSDN_API.Controllers
             int totalCount = userInfos.Count;
             bool hasNext = offset + limit < totalCount;
 
-            if (offset < totalCount)
+            if (offset <= totalCount)
             {
                 if (offset + limit > totalCount)
                     limit = totalCount - offset;

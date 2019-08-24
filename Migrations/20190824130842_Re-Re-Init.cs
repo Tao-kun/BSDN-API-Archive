@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BSDN_API.Migrations
 {
-    public partial class ReInit : Migration
+    public partial class ReReInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -62,7 +62,7 @@ namespace BSDN_API.Migrations
                     Title = table.Column<string>(maxLength: 256, nullable: true),
                     Content = table.Column<string>(nullable: true),
                     PublishDate = table.Column<DateTime>(nullable: false),
-                    UserId = table.Column<int>(nullable: true)
+                    UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,11 +72,11 @@ namespace BSDN_API.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserFollow",
+                name: "UserFollows",
                 columns: table => new
                 {
                     FollowerId = table.Column<int>(nullable: false),
@@ -84,15 +84,15 @@ namespace BSDN_API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserFollow", x => new { x.FollowerId, x.FollowingId });
+                    table.PrimaryKey("PK_UserFollows", x => new { x.FollowerId, x.FollowingId });
                     table.ForeignKey(
-                        name: "FK_UserFollow_Users_FollowerId",
+                        name: "FK_UserFollows_Users_FollowerId",
                         column: x => x.FollowerId,
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserFollow_Users_FollowingId",
+                        name: "FK_UserFollows_Users_FollowingId",
                         column: x => x.FollowingId,
                         principalTable: "Users",
                         principalColumn: "UserId",
@@ -132,7 +132,7 @@ namespace BSDN_API.Migrations
                     Content = table.Column<string>(nullable: true),
                     PublishDate = table.Column<DateTime>(nullable: false),
                     ReplyCommentCommentId = table.Column<int>(nullable: true),
-                    ArticleId = table.Column<int>(nullable: true)
+                    ArticleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -142,7 +142,7 @@ namespace BSDN_API.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "ArticleId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Comments_ReplyCommentCommentId",
                         column: x => x.ReplyCommentCommentId,
@@ -158,7 +158,7 @@ namespace BSDN_API.Migrations
                     ResourceFileId = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Filename = table.Column<string>(maxLength: 512, nullable: true),
-                    ArticleId = table.Column<int>(nullable: true)
+                    ArticleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,7 +168,7 @@ namespace BSDN_API.Migrations
                         column: x => x.ArticleId,
                         principalTable: "Articles",
                         principalColumn: "ArticleId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -209,8 +209,8 @@ namespace BSDN_API.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserFollow_FollowingId",
-                table: "UserFollow",
+                name: "IX_UserFollows_FollowingId",
+                table: "UserFollows",
                 column: "FollowingId");
 
             migrationBuilder.CreateIndex(
@@ -241,7 +241,7 @@ namespace BSDN_API.Migrations
                 name: "Sessions");
 
             migrationBuilder.DropTable(
-                name: "UserFollow");
+                name: "UserFollows");
 
             migrationBuilder.DropTable(
                 name: "Tags");
