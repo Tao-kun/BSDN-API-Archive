@@ -46,8 +46,7 @@ namespace BSDN_API.Controllers
 
             return Ok(result);
         }
-
-        // TODO: GET api/tag/{tag id}
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
