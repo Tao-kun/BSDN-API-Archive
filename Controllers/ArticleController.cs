@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -161,7 +160,7 @@ namespace BSDN_API.Controllers
             _context.Articles.Add(article);
             await _context.SaveChangesAsync();
 
-            result = new ModelResult<Article>(200, null, "Article Created");
+            result = new ModelResult<Article>(201, null, "Article Created");
             return Ok(result);
         }
 

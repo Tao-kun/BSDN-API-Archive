@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -122,7 +121,7 @@ namespace BSDN_API.Controllers
             _context.ArticleTags.Remove(articleTagResult);
             await _context.SaveChangesAsync();
 
-            result = new ModelResult<ArticleTag>(201, articleTagResult, "Tag Deleted");
+            result = new ModelResult<ArticleTag>(200, articleTagResult, "Tag Deleted");
             return Ok(result);
         }
     }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BSDN_API.Migrations
 {
-    public partial class ReReInit : Migration
+    public partial class ReReReInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -131,8 +131,8 @@ namespace BSDN_API.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Content = table.Column<string>(nullable: true),
                     PublishDate = table.Column<DateTime>(nullable: false),
-                    ReplyCommentCommentId = table.Column<int>(nullable: true),
-                    ArticleId = table.Column<int>(nullable: false)
+                    ArticleId = table.Column<int>(nullable: false),
+                    UserId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -144,11 +144,11 @@ namespace BSDN_API.Migrations
                         principalColumn: "ArticleId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Comments_Comments_ReplyCommentCommentId",
-                        column: x => x.ReplyCommentCommentId,
-                        principalTable: "Comments",
-                        principalColumn: "CommentId",
-                        onDelete: ReferentialAction.Restrict);
+                        name: "FK_Comments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -187,9 +187,9 @@ namespace BSDN_API.Migrations
                 column: "ArticleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_ReplyCommentCommentId",
+                name: "IX_Comments_UserId",
                 table: "Comments",
-                column: "ReplyCommentCommentId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ResourceFiles_ArticleId",

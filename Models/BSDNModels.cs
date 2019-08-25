@@ -42,11 +42,6 @@ namespace BSDN_API.Models
                 .WithMany(a => a.Comments)
                 .HasForeignKey(c => c.ArticleId);
 
-            // Reply other comments
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.ReplyComment)
-                .WithMany();
-
             // FK_Article_ResourceFile
             modelBuilder.Entity<ResourceFile>()
                 .HasOne(rf => rf.Article)
