@@ -91,6 +91,15 @@ namespace BSDN_API.Controllers
         {
             ModelResult<User> result;
 
+            if (user.Email == null ||
+                user.Nickname == null ||
+                user.PasswordHash == null ||
+                user.UserId != 0)
+            {
+                result = new ModelResult<User>(400, user, "Invalid User Info");
+                return BadRequest(result);
+            }
+
             var userResult = await _context.Users
                 .FirstOrDefaultAsync(u => u.Nickname == user.Nickname ||
                                           u.Email == user.Email);

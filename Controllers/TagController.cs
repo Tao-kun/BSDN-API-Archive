@@ -46,7 +46,8 @@ namespace BSDN_API.Controllers
 
             return Ok(result);
         }
-        
+
+        // GET api/tag/{tag id}
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -74,6 +75,12 @@ namespace BSDN_API.Controllers
             ModelResult<Tag> result = TokenUtils.CheckToken<Tag>(token, _context);
             if (result != null)
             {
+                return BadRequest(result);
+            }
+
+            if (tag.TagName == null || tag.TagId != 0)
+            {
+                result = new ModelResult<Tag>(400, tag, "Invalid Tag");
                 return BadRequest(result);
             }
 

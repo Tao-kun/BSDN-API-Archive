@@ -106,12 +106,19 @@ namespace BSDN_API.Controllers
             [FromBody] Comment comment,
             [FromQuery(Name = "token")] string token)
         {
-            // 先检查Token是否有效
+            // 先评论是否有正文
+            // 再检查Token是否有效
             // 再检查评论类型
             // 再检查文章/评论是否存在
             ModelResult<CommentInfo> result = TokenUtils.CheckToken<CommentInfo>(token, _context);
             if (result != null)
             {
+                return BadRequest(result);
+            }
+
+            if (comment.Content == null || comment.CommentId != 0)
+            {
+                result = new ModelResult<CommentInfo>(400, new CommentInfo(comment), "Invalid Comment");
                 return BadRequest(result);
             }
 

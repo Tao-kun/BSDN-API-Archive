@@ -151,7 +151,14 @@ namespace BSDN_API.Controllers
                 article.PublishDate = DateTime.Now;
             }
 
-            if (article.Title == null || article.Content == null)
+            if (article.ArticleId != 0)
+            {
+                result = new ModelResult<Article>(400, null, "Invalid Article");
+                return BadRequest(result);
+            }
+
+            if (article.Title == null ||
+                article.Content == null)
             {
                 result = new ModelResult<Article>(400, null, "Article Need Title or Content");
                 return BadRequest(result);
