@@ -134,7 +134,7 @@ namespace BSDN_API.Controllers
 
             _context.Sessions.Remove(sessionResult);
             await _context.SaveChangesAsync();
-
+            
             result = new ModelResult<Session>(200, sessionResult, "Logout");
             return Ok(result);
         }
