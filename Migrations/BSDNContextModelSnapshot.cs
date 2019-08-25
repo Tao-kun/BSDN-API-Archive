@@ -64,13 +64,13 @@ namespace BSDN_API.Migrations
 
                     b.Property<DateTime>("PublishDate");
 
-                    b.Property<int?>("ReplyCommentCommentId");
+                    b.Property<int>("UserId");
 
                     b.HasKey("CommentId");
 
                     b.HasIndex("ArticleId");
 
-                    b.HasIndex("ReplyCommentCommentId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -196,9 +196,10 @@ namespace BSDN_API.Migrations
                         .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("BSDN_API.Models.Comment", "ReplyComment")
+                    b.HasOne("BSDN_API.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("ReplyCommentCommentId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BSDN_API.Models.ResourceFile", b =>

@@ -74,20 +74,6 @@ namespace BSDN_API.Models
         }
     }
 
-
-    public class Comment
-    {
-        public int CommentId { set; get; }
-        public string Content { set; get; }
-        public DateTime PublishDate { set; get; }
-
-        public Comment ReplyComment { set; get; }
-
-        // FK_Article_Comment
-        public int ArticleId { set; get; }
-        public Article Article { set; get; }
-    }
-
     public class ResourceFile
     {
         public int ResourceFileId { set; get; }

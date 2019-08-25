@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -152,7 +151,7 @@ namespace BSDN_API.Controllers
         // DELETE api/user/{user id}?token={token}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(
-            int id, 
+            int id,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<User> result = TokenUtils.CheckToken<User>(token, _context);

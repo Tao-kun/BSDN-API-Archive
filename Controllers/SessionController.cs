@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -134,7 +133,7 @@ namespace BSDN_API.Controllers
 
             _context.Sessions.Remove(sessionResult);
             await _context.SaveChangesAsync();
-            
+
             result = new ModelResult<Session>(200, sessionResult, "Logout");
             return Ok(result);
         }

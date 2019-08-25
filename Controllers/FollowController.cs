@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BSDN_API.Models;
 using BSDN_API.Utils;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BSDN_API.Controllers
 {

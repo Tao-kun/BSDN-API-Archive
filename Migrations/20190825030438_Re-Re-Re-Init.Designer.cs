@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSDN_API.Migrations
 {
     [DbContext(typeof(BSDNContext))]
-    [Migration("20190824130842_Re-Re-Init")]
-    partial class ReReInit
+    [Migration("20190825030438_Re-Re-Re-Init")]
+    partial class ReReReInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -66,13 +66,13 @@ namespace BSDN_API.Migrations
 
                     b.Property<DateTime>("PublishDate");
 
-                    b.Property<int?>("ReplyCommentCommentId");
+                    b.Property<int>("UserId");
 
                     b.HasKey("CommentId");
 
                     b.HasIndex("ArticleId");
 
-                    b.HasIndex("ReplyCommentCommentId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Comments");
                 });
@@ -198,9 +198,10 @@ namespace BSDN_API.Migrations
                         .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("BSDN_API.Models.Comment", "ReplyComment")
+                    b.HasOne("BSDN_API.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("ReplyCommentCommentId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BSDN_API.Models.ResourceFile", b =>
