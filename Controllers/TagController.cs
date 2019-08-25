@@ -70,7 +70,7 @@ namespace BSDN_API.Controllers
         // POST api/tag?token={token}
         [HttpPost]
         public async Task<IActionResult> Post(
-            [FromBody] Tag tag, 
+            [FromBody] Tag tag,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<Tag> result = TokenUtils.CheckToken<Tag>(token, _context);
@@ -130,7 +130,7 @@ namespace BSDN_API.Controllers
         // DELETE api/tag/{tag id}?token={token}
         [HttpDelete("id")]
         public async Task<IActionResult> Delete(
-            int id, 
+            int id,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<Tag> result = TokenUtils.CheckToken<Tag>(token, _context);

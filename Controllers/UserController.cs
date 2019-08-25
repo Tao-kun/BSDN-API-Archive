@@ -152,7 +152,7 @@ namespace BSDN_API.Controllers
         // DELETE api/user/{user id}?token={token}
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(
-            int id, 
+            int id,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<User> result = TokenUtils.CheckToken<User>(token, _context);

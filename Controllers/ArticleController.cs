@@ -22,7 +22,7 @@ namespace BSDN_API.Controllers
         {
             _context = context;
         }
-        
+
         // GET api/article?offset={offset}&limit={limit}&sort={sort type id}&tag={tag id}&keyword={keyword}
         // GET api/article?id={user id}&offset={offset}&limit={limit}&sort={sort type id}&tag={tag id}
         [HttpGet]
@@ -132,7 +132,7 @@ namespace BSDN_API.Controllers
         // POST api/article?token={token}
         [HttpPost]
         public async Task<IActionResult> Post(
-            [FromBody] Article article, 
+            [FromBody] Article article,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<Article> result = TokenUtils.CheckToken<Article>(token, _context);
@@ -227,7 +227,7 @@ namespace BSDN_API.Controllers
             {
                 article.ResourceFiles = articleResult.ResourceFiles;
             }
-            
+
             _context.Entry(article).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
@@ -238,7 +238,7 @@ namespace BSDN_API.Controllers
         // DELETE api/article/{id}?token={token}
         [HttpDelete("id")]
         public async Task<IActionResult> Delete(
-            int id, 
+            int id,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<Article> result = TokenUtils.CheckToken<Article>(token, _context);
