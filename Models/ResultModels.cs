@@ -23,13 +23,15 @@ namespace BSDN_API.Models
         public string Message { set; get; }
         public List<T> Data { set; get; }
         public bool HasNext { set; get; }
+        public int TotalCount { set; get; }
 
-        public ModelResultList(int status, List<T> data, string message, bool hasNext)
+        public ModelResultList(int status, List<T> data, string message, bool hasNext, int count)
         {
             Status = status;
             Data = data;
             Message = message;
             HasNext = hasNext;
+            TotalCount = count;
         }
     }
 }

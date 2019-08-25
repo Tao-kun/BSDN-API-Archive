@@ -9,7 +9,7 @@ namespace BSDN_API.Utils
 {
     public class TokenUtils
     {
-        public static string GenerateSessionToken(User user)
+        public static string GenerateSessionToken(User user, BSDNContext context)
         {
             var rawToken = user.Nickname + user.UserId + user.Email + DateTime.Now.ToString();
             var md5 = MD5.Create();
@@ -20,7 +20,9 @@ namespace BSDN_API.Utils
                 stringBuilder.Append(ch.ToString("x2"));
             }
 
-            return stringBuilder.ToString();
+            string token = stringBuilder.ToString();
+            Session session = context.Sessions.FirstOrDefault(s => s.SessionToken == token);
+            return session == null ? token : null;
         }
 
         public static ModelResult<T> CheckToken<T>(string token, BSDNContext context)
@@ -38,7 +40,6 @@ namespace BSDN_API.Utils
                 {
                     result = new ModelResult<T>(405, default, "Token Not Exists");
                 }
-
                 else if (session.ExpiresTime < DateTime.Now)
                 {
                     result = new ModelResult<T>(405, default, "Token Expires");
