@@ -125,6 +125,7 @@ namespace BSDN_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
+            // TODO: 只有带有效token的访问会改变点击量
             ModelResult<ArticleInfo> result;
             var articleResult = await _context.Articles
                 .FirstOrDefaultAsync(a => a.ArticleId == id);
