@@ -48,6 +48,7 @@ namespace BSDN_API.Controllers
             }
 
             List<CommentInfo> commentInfos = _context.Comments
+                .Where(c => c.ArticleId == id)
                 .Select(c => new CommentInfo(c)).ToList()
                 .Select(ci =>
                 {

@@ -136,12 +136,11 @@ namespace BSDN_API.Controllers
 
             articleResult.User = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserId == articleResult.UserId);
+            articleResult.ArticleTags = await _context.ArticleTags
+                .Where(at => at.ArticleId == articleResult.ArticleId).ToListAsync();
             ArticleInfo articleInfo = new ArticleInfo(articleResult, _context);
-            articleInfo.TagInfos = _context.Tags.ToList()
-                .Select(t => new TagInfo(t)).ToList();
             articleInfo.CommentCount = _context.Comments
                 .Count(c => c.ArticleId == articleInfo.ArticleId);
-
             result = new ModelResult<ArticleInfo>(200, articleInfo, "Article Exists");
             return Ok(result);
         }

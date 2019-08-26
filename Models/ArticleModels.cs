@@ -56,15 +56,17 @@ namespace BSDN_API.Models
             Title = article.Title;
             Content = article.Content;
             PublishDate = article.PublishDate;
-            if (article.ArticleTags == null)
+            if (article.ArticleTags == null || article.ArticleTags.Count == 0)
             {
                 TagInfos = null;
             }
             else
             {
-                TagInfos = article.ArticleTags.Select(
-                    at => context.Tags.FirstOrDefault(t => t.TagId == at.TagId)
-                ).Select(t => new TagInfo(t)).ToList();
+                TagInfos = article.ArticleTags
+                    .Where(at => at.ArticleId == article.ArticleId)
+                    .Select(
+                        at => context.Tags.FirstOrDefault(t => t.TagId == at.TagId)
+                    ).Select(t => new TagInfo(t)).ToList();
             }
 
             CommentCount = article.Comments?.Count ?? 0;
