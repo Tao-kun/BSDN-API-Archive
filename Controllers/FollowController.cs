@@ -22,7 +22,7 @@ namespace BSDN_API.Controllers
             _context = context;
         }
 
-        // GET api/follow/{follower,following}?id={user id}&offset=<offset>&limit={limit}
+        // GET api/follow/{follower,following}?id={user id}&offset={offset}&limit={limit}
         [HttpGet("{type}")]
         public async Task<IActionResult> Get(
             string type,
@@ -34,7 +34,7 @@ namespace BSDN_API.Controllers
 
             if (limit == 0)
             {
-                limit = 20;
+                limit = 10;
             }
             else if (limit < 0)
             {
@@ -43,7 +43,8 @@ namespace BSDN_API.Controllers
 
             if (id == 0)
             {
-                result = new ModelResultList<UserFollowInfo>(404, null, "Need User Id", false, 0);
+                result = new ModelResultList<UserFollowInfo>(404, null,
+                    "Need User Id", false, 0, null);
                 return BadRequest(result);
             }
 
@@ -70,7 +71,8 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                result = new ModelResultList<UserFollowInfo>(403, null, "Invalid Type", false, 0);
+                result = new ModelResultList<UserFollowInfo>(403, null,
+                    "Invalid Type", false, 0, null);
                 return BadRequest(result);
             }
 
@@ -78,6 +80,18 @@ namespace BSDN_API.Controllers
 
             int totalCount = userFollowInfos.Count;
             bool hasNext = offset + limit < totalCount;
+
+            string nextUrl;
+            if (hasNext)
+            {
+                // TODO: impl it
+                nextUrl = $@"/api/follow/{type}?id={id}&offset={limit + offset}&limit={limit}";
+            }
+            else
+            {
+                nextUrl = null;
+            }
+
             if (offset <= totalCount)
             {
                 if (offset + limit > totalCount)
@@ -86,14 +100,15 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                result = new ModelResultList<UserFollowInfo>(400, null, "Index Out of Limit", false, totalCount);
+                result = new ModelResultList<UserFollowInfo>(400, null,
+                    "Index Out of Limit", false, totalCount, nextUrl);
                 return BadRequest(result);
             }
 
             if (userFollowInfos.Count == 0)
             {
-                result = new ModelResultList<UserFollowInfo>(
-                    400, null, $"No {type}", false, totalCount);
+                result = new ModelResultList<UserFollowInfo>(400, null,
+                    $"No {type}", false, totalCount, nextUrl);
             }
             else
             {
@@ -106,7 +121,8 @@ namespace BSDN_API.Controllers
                             .Count(uf => uf.FollowerId == ufi.UserId);
                         return ufi;
                     }).ToList();
-                result = new ModelResultList<UserFollowInfo>(200, userFollowInfos, null, hasNext, totalCount);
+                result = new ModelResultList<UserFollowInfo>(200, userFollowInfos,
+                    null, hasNext, totalCount, nextUrl);
             }
 
             return Ok(result);

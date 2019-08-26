@@ -51,8 +51,8 @@ namespace BSDN_API.Models
             Nickname = user.Nickname;
             SignDate = user.SignDate;
             ArticleCount = user.Articles?.Count ?? 0;
-            UserFollowerCount = user.UserFollowers?.Count ?? 0;
-            UserFollowingCount = user.UserFollowings?.Count ?? 0;
+            UserFollowerCount = default;
+            UserFollowingCount = default;
         }
     }
 

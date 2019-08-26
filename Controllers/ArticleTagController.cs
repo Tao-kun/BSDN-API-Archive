@@ -114,7 +114,7 @@ namespace BSDN_API.Controllers
                 .FirstOrDefaultAsync(at => at.ArticleId == articleId && at.TagId == tagId);
             if (articleTagResult == null)
             {
-                result = new ModelResult<ArticleTag>(405, articleTagResult, "Article Tag Not Exists");
+                result = new ModelResult<ArticleTag>(405, null, "Article Tag Not Exists");
                 return BadRequest(result);
             }
 

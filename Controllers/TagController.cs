@@ -37,11 +37,13 @@ namespace BSDN_API.Controllers
                 .Select(t => new TagInfo(t)).ToList();
             if (tagResult.Count == 0)
             {
-                result = new ModelResultList<TagInfo>(404, null, "No Tag Exists", false, 0);
+                result = new ModelResultList<TagInfo>(404, null,
+                    "No Tag Exists", false, 0, null);
             }
             else
             {
-                result = new ModelResultList<TagInfo>(200, tagResult, null, false, tagResult.Count);
+                result = new ModelResultList<TagInfo>(200, tagResult,
+                    null, false, tagResult.Count, null);
             }
 
             return Ok(result);
