@@ -145,6 +145,11 @@ namespace BSDN_API.Controllers
             }
             else if (type == "article")
             {
+                if (comment.ArticleId == 0)
+                    comment.ArticleId = id;
+                if (id == 0)
+                    id = comment.ArticleId;
+
                 Session sessionResult = await _context.Sessions
                     .FirstOrDefaultAsync(s => s.SessionToken == token);
                 Article articleResult = await _context.Articles
@@ -158,8 +163,8 @@ namespace BSDN_API.Controllers
                 comment.UserId = sessionResult.SessionUserId;
                 comment.User = await _context.Users
                     .FirstOrDefaultAsync(u => u.UserId == comment.UserId);
-                if (id == 0)
-                    comment.ArticleId = id;
+
+                comment.ArticleId = id;
                 comment.Article = articleResult;
 
                 await _context.AddAsync(comment);
