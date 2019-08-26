@@ -143,7 +143,7 @@ namespace BSDN_API.Controllers
                 // TODO: impl it
                 return BadRequest("UnImplemented");
             }
-            else if (type == "comment")
+            else if (type == "article")
             {
                 Session sessionResult = await _context.Sessions
                     .FirstOrDefaultAsync(s => s.SessionToken == token);
