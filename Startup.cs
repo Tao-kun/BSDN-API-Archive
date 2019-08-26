@@ -30,6 +30,18 @@ namespace BSDN_API
             services.AddDbContext<BSDNContext>(
                 options => options.UseMySql(Configuration.GetConnectionString("BSDNContext"))
             );
+            services.AddCors(
+                options =>
+                {
+                    options.AddPolicy("BSDNPolicy", builder =>
+                    {
+                        builder.AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowAnyOrigin();
+                    });
+                }
+            );
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -42,6 +54,7 @@ namespace BSDN_API
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("BSDNPolicy");
             app.UseMvc();
         }
     }

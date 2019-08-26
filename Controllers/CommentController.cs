@@ -33,7 +33,7 @@ namespace BSDN_API.Controllers
             ModelResultList<CommentInfo> result;
             if (limit == 0)
             {
-                limit = 20;
+                limit = 10;
             }
             else if (limit < 0)
             {
@@ -42,7 +42,8 @@ namespace BSDN_API.Controllers
 
             if (id == 0)
             {
-                result = new ModelResultList<CommentInfo>(400, null, "No Article Id", false, 0);
+                result = new ModelResultList<CommentInfo>(400, null,
+                    "No Article Id", false, 0, null);
                 return BadRequest(result);
             }
 
@@ -55,6 +56,18 @@ namespace BSDN_API.Controllers
                 }).ToList();
             int totalCount = commentInfos.Count;
             bool hasNext = offset + limit < totalCount;
+
+            string nextUrl;
+            if (hasNext)
+            {
+                // TODO: impl it
+                nextUrl = $@"/api/comment?id={id}&limit={limit}&offset={limit + offset}";
+            }
+            else
+            {
+                nextUrl = null;
+            }
+
             if (offset <= totalCount)
             {
                 if (offset + limit > totalCount)
@@ -63,18 +76,21 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                result = new ModelResultList<CommentInfo>(400, null, "Index Out of Range", hasNext, totalCount);
+                result = new ModelResultList<CommentInfo>(400, null,
+                    "Index Out of Range", hasNext, totalCount, nextUrl);
                 return BadRequest(result);
             }
 
             if (commentInfos.Count == 0)
             {
-                result = new ModelResultList<CommentInfo>(404, null, "No Comment Exists", hasNext, totalCount);
+                result = new ModelResultList<CommentInfo>(404, null,
+                    "No Comment Exists", hasNext, totalCount, nextUrl);
             }
             else
             {
                 commentInfos = commentInfos.ToList();
-                result = new ModelResultList<CommentInfo>(200, commentInfos, null, hasNext, totalCount);
+                result = new ModelResultList<CommentInfo>(200, commentInfos,
+                    null, hasNext, totalCount, nextUrl);
             }
 
             return Ok(result);
@@ -106,12 +122,19 @@ namespace BSDN_API.Controllers
             [FromBody] Comment comment,
             [FromQuery(Name = "token")] string token)
         {
-            // 先检查Token是否有效
+            // 先评论是否有正文
+            // 再检查Token是否有效
             // 再检查评论类型
             // 再检查文章/评论是否存在
             ModelResult<CommentInfo> result = TokenUtils.CheckToken<CommentInfo>(token, _context);
             if (result != null)
             {
+                return BadRequest(result);
+            }
+
+            if (comment.Content == null || comment.CommentId != 0)
+            {
+                result = new ModelResult<CommentInfo>(400, new CommentInfo(comment), "Invalid Comment");
                 return BadRequest(result);
             }
 
@@ -135,7 +158,8 @@ namespace BSDN_API.Controllers
                 comment.UserId = sessionResult.SessionUserId;
                 comment.User = await _context.Users
                     .FirstOrDefaultAsync(u => u.UserId == comment.UserId);
-                comment.ArticleId = id;
+                if (id == 0)
+                    comment.ArticleId = id;
                 comment.Article = articleResult;
 
                 await _context.AddAsync(comment);

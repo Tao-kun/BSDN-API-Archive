@@ -70,7 +70,7 @@ namespace BSDN_API.Models
             CommentCount = article.Comments?.Count ?? 0;
             ResourceFileCount = article.ResourceFiles?.Count ?? 0;
             UserId = article.UserId;
-            NickName = article.User.Nickname;
+            NickName = article.User?.Nickname;
         }
     }
 

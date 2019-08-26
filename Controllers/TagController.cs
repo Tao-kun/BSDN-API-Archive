@@ -37,16 +37,19 @@ namespace BSDN_API.Controllers
                 .Select(t => new TagInfo(t)).ToList();
             if (tagResult.Count == 0)
             {
-                result = new ModelResultList<TagInfo>(404, null, "No Tag Exists", false, 0);
+                result = new ModelResultList<TagInfo>(404, null,
+                    "No Tag Exists", false, 0, null);
             }
             else
             {
-                result = new ModelResultList<TagInfo>(200, tagResult, null, false, tagResult.Count);
+                result = new ModelResultList<TagInfo>(200, tagResult,
+                    null, false, tagResult.Count, null);
             }
 
             return Ok(result);
         }
-        
+
+        // GET api/tag/{tag id}
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -74,6 +77,12 @@ namespace BSDN_API.Controllers
             ModelResult<Tag> result = TokenUtils.CheckToken<Tag>(token, _context);
             if (result != null)
             {
+                return BadRequest(result);
+            }
+
+            if (tag.TagName == null || tag.TagId != 0)
+            {
+                result = new ModelResult<Tag>(400, tag, "Invalid Tag");
                 return BadRequest(result);
             }
 

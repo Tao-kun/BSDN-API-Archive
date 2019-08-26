@@ -37,7 +37,7 @@ namespace BSDN_API.Controllers
             // TODO: 排序、分类
             if (limit == 0)
             {
-                limit = 20;
+                limit = 10;
             }
             else if (limit < 0)
             {
@@ -49,7 +49,7 @@ namespace BSDN_API.Controllers
             if (userId != 0)
             {
                 articleQuery = _context.Articles
-                    .Where(a => a.User.UserId == userId);
+                    .Where(a => a.UserId == userId);
             }
             else if (keyword != null)
             {
@@ -69,15 +69,31 @@ namespace BSDN_API.Controllers
                     .Where(a => a.ArticleTags.Exists(at => at.TagId == tagId));
             }
 
-            List<ArticleInfo> articleInfos = articleQuery.ToList()
-                .Select(a =>
-                {
-                    a.User = _context.Users.FirstOrDefault(u => u.UserId == a.UserId);
-                    return a;
-                })
+            List<ArticleInfo> articleInfos = articleQuery
                 .Select(a => new ArticleInfo(a, _context)).ToList();
             int totalCount = articleInfos.Count;
             bool hasNext = offset + limit < totalCount;
+
+            string nextUrl;
+            if (hasNext)
+            {
+                // TODO: impl it
+                nextUrl = $@"/api/article?offset={limit + offset}&limit={limit}&tag={tagId}";
+                if (userId != 0)
+                {
+                    nextUrl += $@"&id={userId}";
+                }
+                else if (keyword != null)
+                {
+                    nextUrl += $@"&keyword={keyword}";
+                }
+
+                // TODO: 排序
+            }
+            else
+            {
+                nextUrl = null;
+            }
 
             if (offset <= totalCount)
             {
@@ -87,25 +103,19 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                result = new ModelResultList<ArticleInfo>(400, null, "Index Out of Limit", false, totalCount);
+                result = new ModelResultList<ArticleInfo>(400, null,
+                    "Index Out of Limit", false, totalCount, nextUrl);
                 return BadRequest(result);
             }
 
             if (articleInfos.Count == 0)
             {
-                result = new ModelResultList<ArticleInfo>(404, null, "No Article Exists", hasNext, totalCount);
+                result = new ModelResultList<ArticleInfo>(404, null,
+                    "No Article Exists", hasNext, totalCount, nextUrl);
             }
             else
             {
-                articleInfos = articleInfos
-                    .Select(ai =>
-                    {
-                        ai.TagInfos = _context.ArticleTags
-                            .Where(at => at.ArticleId == ai.ArticleId)
-                            .Select(at => new TagInfo(at.Tag)).ToList();
-                        return ai;
-                    }).ToList();
-                result = new ModelResultList<ArticleInfo>(200, articleInfos, null, hasNext, totalCount);
+                result = new ModelResultList<ArticleInfo>(200, articleInfos, null, hasNext, totalCount, nextUrl);
             }
 
             return Ok(result);
@@ -115,16 +125,24 @@ namespace BSDN_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            ModelResult<Article> result;
+            ModelResult<ArticleInfo> result;
             var articleResult = await _context.Articles
                 .FirstOrDefaultAsync(a => a.ArticleId == id);
             if (articleResult == null)
             {
-                result = new ModelResult<Article>(404, articleResult, "Article Not Exists");
+                result = new ModelResult<ArticleInfo>(404, null, "Article Not Exists");
                 return BadRequest(result);
             }
 
-            result = new ModelResult<Article>(200, articleResult, "Article Exists");
+            articleResult.User = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserId == articleResult.UserId);
+            ArticleInfo articleInfo = new ArticleInfo(articleResult, _context);
+            articleInfo.TagInfos = _context.Tags.ToList()
+                .Select(t => new TagInfo(t)).ToList();
+            articleInfo.CommentCount = _context.Comments
+                .Count(c => c.ArticleId == articleInfo.ArticleId);
+
+            result = new ModelResult<ArticleInfo>(200, articleInfo, "Article Exists");
             return Ok(result);
         }
 
@@ -134,7 +152,7 @@ namespace BSDN_API.Controllers
             [FromBody] Article article,
             [FromQuery(Name = "token")] string token)
         {
-            ModelResult<Article> result = TokenUtils.CheckToken<Article>(token, _context);
+            ModelResult<ArticleInfo> result = TokenUtils.CheckToken<ArticleInfo>(token, _context);
             if (result != null)
             {
                 return BadRequest(result);
@@ -151,16 +169,23 @@ namespace BSDN_API.Controllers
                 article.PublishDate = DateTime.Now;
             }
 
-            if (article.Title == null || article.Content == null)
+            if (article.ArticleId != 0)
             {
-                result = new ModelResult<Article>(400, null, "Article Need Title or Content");
+                result = new ModelResult<ArticleInfo>(400, null, "Invalid Article");
+                return BadRequest(result);
+            }
+
+            if (article.Title == null ||
+                article.Content == null)
+            {
+                result = new ModelResult<ArticleInfo>(400, null, "Article Need Title or Content");
                 return BadRequest(result);
             }
 
             _context.Articles.Add(article);
             await _context.SaveChangesAsync();
 
-            result = new ModelResult<Article>(201, null, "Article Created");
+            result = new ModelResult<ArticleInfo>(201, new ArticleInfo(article, _context), "Article Created");
             return Ok(result);
         }
 

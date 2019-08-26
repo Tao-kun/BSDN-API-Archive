@@ -24,15 +24,19 @@ namespace BSDN_API.Controllers
 
         // GET api/user?offset={offset}&limit={limit}&sort={sort type id}&keyword={keyword}
         // TODO: 搜索
+        // TODO: 关注人数、被关注人数
         [HttpGet]
         public async Task<IActionResult> Get(
             [FromQuery(Name = "offset")] int offset,
-            [FromQuery(Name = "limit")] int limit)
+            [FromQuery(Name = "limit")] int limit,
+            [FromQuery(Name = "sort")] int sort,
+            [FromQuery(Name = "keyword")] string keyword)
         {
+            // TODO: 排序、搜索
             ModelResultList<UserInfo> result;
             if (limit == 0)
             {
-                limit = 20;
+                limit = 10;
             }
             else if (limit < 0)
             {
@@ -43,6 +47,18 @@ namespace BSDN_API.Controllers
             int totalCount = userInfos.Count;
             bool hasNext = offset + limit < totalCount;
 
+            string nextUrl;
+            if (hasNext)
+            {
+                // TODO: impl it
+                // TODO: 排序、搜索
+                nextUrl = $@"/api/user?limit={limit}&offset={limit + offset}";
+            }
+            else
+            {
+                nextUrl = null;
+            }
+
             if (offset <= totalCount)
             {
                 if (offset + limit > totalCount)
@@ -51,24 +67,27 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                result = new ModelResultList<UserInfo>(
-                    400, null, "Index Out of Index", false, totalCount);
+                result = new ModelResultList<UserInfo>(400, null,
+                    "Index Out of Index", false, totalCount, nextUrl);
                 return BadRequest(result);
             }
 
             if (userInfos.Count == 0)
             {
-                result = new ModelResultList<UserInfo>(404, null, "No User Exists", hasNext, totalCount);
+                result = new ModelResultList<UserInfo>(404, null,
+                    "No User Exists", hasNext, totalCount, nextUrl);
             }
             else
             {
-                result = new ModelResultList<UserInfo>(200, userInfos, null, hasNext, totalCount);
+                result = new ModelResultList<UserInfo>(200, userInfos,
+                    null, hasNext, totalCount, nextUrl);
             }
 
             return Ok(result);
         }
 
         // GET api/user/{user id}
+        // TODO: 关注人数、被关注人数
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -90,6 +109,15 @@ namespace BSDN_API.Controllers
         public async Task<IActionResult> Post([FromBody] User user)
         {
             ModelResult<User> result;
+
+            if (user.Email == null ||
+                user.Nickname == null ||
+                user.PasswordHash == null ||
+                user.UserId != 0)
+            {
+                result = new ModelResult<User>(400, user, "Invalid User Info");
+                return BadRequest(result);
+            }
 
             var userResult = await _context.Users
                 .FirstOrDefaultAsync(u => u.Nickname == user.Nickname ||
