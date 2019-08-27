@@ -61,7 +61,6 @@ namespace BSDN_API.Controllers
             string nextUrl;
             if (hasNext)
             {
-                // TODO: impl it
                 nextUrl = $@"/api/comment?id={id}&limit={limit}&offset={limit + offset}";
             }
             else
@@ -138,6 +137,8 @@ namespace BSDN_API.Controllers
                 result = new ModelResult<CommentInfo>(400, new CommentInfo(comment), "Invalid Comment");
                 return BadRequest(result);
             }
+
+            comment.PublishDate = DateTime.Now;
 
             if (type == "reply")
             {

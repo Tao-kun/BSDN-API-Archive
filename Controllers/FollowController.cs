@@ -30,6 +30,7 @@ namespace BSDN_API.Controllers
             [FromQuery(Name = "offset")] int offset,
             [FromQuery(Name = "limit")] int limit)
         {
+            // TODO: 排序
             ModelResultList<UserFollowInfo> result;
 
             if (limit == 0)

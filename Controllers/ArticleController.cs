@@ -33,8 +33,21 @@ namespace BSDN_API.Controllers
             [FromQuery(Name = "tag")] int tagId,
             [FromQuery(Name = "keyword")] string keyword)
         {
+            // 排序相关：
+            // 0     -> 不排序，直接返回查询结果（默认）
+            // 1     -> 按照文章的作者ID升序
+            // 2     -> 按照文章的作者ID降序
+            // 3     -> 按照文章发表日期升序
+            // 4     -> 按照的文章发表日期降序
+            // 5     -> 按照标题升序
+            // 6     -> 按照标题降序
+            // 7     -> 按照浏览量升序
+            // 8     -> 按照浏览量降序
+            // 9     -> 按照评论量升序
+            // 10    -> 按照评论量降序
+            // other -> 不排序，直接返回查询结果（同0）
+
             ModelResultList<ArticleInfo> result;
-            // TODO: 排序、分类
             if (limit == 0)
             {
                 limit = 10;
@@ -53,7 +66,6 @@ namespace BSDN_API.Controllers
             }
             else if (keyword != null)
             {
-                // TODO: 搜索、分词
                 articleQuery = _context.Articles
                     .Where(a => a.Content.Contains(keyword) ||
                                 a.Title.Contains(keyword));
@@ -72,27 +84,63 @@ namespace BSDN_API.Controllers
             List<ArticleInfo> articleInfos = articleQuery
                 .Select(a => new ArticleInfo(a, _context)).ToList();
             int totalCount = articleInfos.Count;
-            bool hasNext = offset + limit < totalCount;
 
+            if (totalCount == 0)
+            {
+                result = new ModelResultList<ArticleInfo>(404, null,
+                    "No Article Exists", false, totalCount, null);
+                return Ok(result);
+            }
+
+            bool hasNext = offset + limit < totalCount;
             string nextUrl;
             if (hasNext)
             {
-                // TODO: impl it
-                nextUrl = $@"/api/article?offset={limit + offset}&limit={limit}&tag={tagId}";
-                if (userId != 0)
-                {
-                    nextUrl += $@"&id={userId}";
-                }
-                else if (keyword != null)
-                {
-                    nextUrl += $@"&keyword={keyword}";
-                }
-
-                // TODO: 排序
+                nextUrl = $@"/api/article?id={userId}&keyword={keyword}&tag={tagId}&offset={limit + offset}&limit={limit}";
             }
             else
             {
                 nextUrl = null;
+            }
+
+            articleInfos = articleInfos.Select(ai =>
+            {
+                ai.CommentCount = _context.Comments.Count(c => c.ArticleId == ai.ArticleId);
+                return ai;
+            }).ToList();
+
+            switch (sort)
+            {
+                case 1:
+                    articleInfos.Sort((a1, a2) => a1.UserId - a2.UserId);
+                    break;
+                case 2:
+                    articleInfos.Sort((a1, a2) => a2.UserId - a1.UserId);
+                    break;
+                case 3:
+                    articleInfos.Sort((a1, a2) => DateTime.Compare(a1.PublishDate, a2.PublishDate));
+                    break;
+                case 4:
+                    articleInfos.Sort((a1, a2) => DateTime.Compare(a2.PublishDate, a1.PublishDate));
+                    break;
+                case 5:
+                    articleInfos.Sort((a1, a2) => string.CompareOrdinal(a1.Title, a2.Title));
+                    break;
+                case 6:
+                    articleInfos.Sort((a1, a2) => string.CompareOrdinal(a2.Title, a1.Title));
+                    break;
+                case 7:
+                    articleInfos.Sort((a1, a2) => a1.ViewNumber - a2.ViewNumber);
+                    break;
+                case 8:
+                    articleInfos.Sort((a1, a2) => a2.ViewNumber - a1.ViewNumber);
+                    break;
+                case 9:
+                    articleInfos.Sort((a1, a2) => a1.CommentCount - a2.CommentCount);
+                    break;
+                case 10:
+                    articleInfos.Sort((a1, a2) => a2.CommentCount - a1.CommentCount);
+                    break;
             }
 
             if (offset <= totalCount)
@@ -121,9 +169,9 @@ namespace BSDN_API.Controllers
             return Ok(result);
         }
 
-        // GET api/article/{article id}
+        // GET api/article/{article id}?token={token}
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id, [FromQuery(Name = "token")] string token)
         {
             ModelResult<ArticleInfo> result;
             var articleResult = await _context.Articles
@@ -132,6 +180,14 @@ namespace BSDN_API.Controllers
             {
                 result = new ModelResult<ArticleInfo>(404, null, "Article Not Exists");
                 return BadRequest(result);
+            }
+
+            if (token != null && TokenUtils.CheckToken<ArticleInfo>(token, _context) == null)
+            {
+                // Token有效，点击量+1
+                articleResult.ViewNumber += 1;
+                _context.Entry(articleResult).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
             }
 
             articleResult.User = await _context.Users
@@ -210,7 +266,7 @@ namespace BSDN_API.Controllers
             }
 
             User userResult = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId == article.User.UserId);
+                .FirstOrDefaultAsync(u => u.UserId == articleResult.UserId);
             Session sessionResult = await _context.Sessions
                 .FirstOrDefaultAsync(s => s.SessionToken == token);
             if (userResult == null ||
@@ -220,38 +276,10 @@ namespace BSDN_API.Controllers
                 return BadRequest(result);
             }
 
-            if (id != article.ArticleId)
-            {
-                result = new ModelResult<Article>(405, null, "Cannot Modify ArticleId");
-                return BadRequest(result);
-            }
+            articleResult.Title = article.Title;
+            articleResult.Content = article.Content;
 
-            if (article.PublishDate == DateTime.MinValue)
-            {
-                article.PublishDate = articleResult.PublishDate;
-            }
-
-            if (article.ViewNumber == 0)
-            {
-                article.ViewNumber = articleResult.ViewNumber;
-            }
-
-            if (article.Comments == null || article.Comments.Count == 0)
-            {
-                article.Comments = articleResult.Comments;
-            }
-
-            if (article.ArticleTags == null || article.ArticleTags.Count == 0)
-            {
-                article.ArticleTags = articleResult.ArticleTags;
-            }
-
-            if (article.ResourceFiles == null || article.ResourceFiles.Count == 0)
-            {
-                article.ResourceFiles = articleResult.ResourceFiles;
-            }
-
-            _context.Entry(article).State = EntityState.Modified;
+            _context.Entry(articleResult).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             result = new ModelResult<Article>(200, null, "Article Modified");
