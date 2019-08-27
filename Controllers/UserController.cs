@@ -23,8 +23,6 @@ namespace BSDN_API.Controllers
         }
 
         // GET api/user?offset={offset}&limit={limit}&sort={sort type id}&keyword={keyword}
-        // TODO: 搜索
-        // TODO: 关注人数、被关注人数
         [HttpGet]
         public async Task<IActionResult> Get(
             [FromQuery(Name = "offset")] int offset,
@@ -32,7 +30,15 @@ namespace BSDN_API.Controllers
             [FromQuery(Name = "sort")] int sort,
             [FromQuery(Name = "keyword")] string keyword)
         {
-            // TODO: 排序、搜索
+            // 排序相关：
+            // 0     -> 不排序，直接返回查询结果（默认）
+            // 1     -> 按照结果中的用户ID升序
+            // 2     -> 按照结果中的用户ID降序
+            // 3     -> 按照结果中的用户注册日期升序
+            // 4     -> 按照结果中的用户注册日期降序
+            // 5     -> 按照结果中的用户昵称名升序
+            // 6     -> 按照结果中的用户昵称名降序
+            // other -> 不排序，直接返回查询结果（同0）
             ModelResultList<UserInfo> result;
             if (limit == 0)
             {
@@ -44,19 +50,53 @@ namespace BSDN_API.Controllers
             }
 
             List<UserInfo> userInfos = await _context.Users.Select(u => new UserInfo(u)).ToListAsync();
+            if (keyword != null)
+                userInfos = userInfos
+                    .Where(ui => ui.Nickname.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) > 0)
+                    .ToList();
+
             int totalCount = userInfos.Count;
+            if (totalCount == 0)
+            {
+                result = new ModelResultList<UserInfo>(404, null,
+                    "No User Exists", false, totalCount, null);
+                return Ok(result);
+            }
+
             bool hasNext = offset + limit < totalCount;
 
             string nextUrl;
             if (hasNext)
             {
-                // TODO: impl it
-                // TODO: 排序、搜索
-                nextUrl = $@"/api/user?limit={limit}&offset={limit + offset}";
+                nextUrl = $@"/api/user?sort={sort}&keyword={keyword}&limit={limit}&offset={limit + offset}";
             }
             else
             {
                 nextUrl = null;
+            }
+
+            switch (sort)
+            {
+                case 0:
+                    break;
+                case 1:
+                    userInfos.Sort((u1, u2) => u1.UserId - u2.UserId);
+                    break;
+                case 2:
+                    userInfos.Sort((u1, u2) => u2.UserId - u1.UserId);
+                    break;
+                case 3:
+                    userInfos.Sort((u1, u2) => DateTime.Compare(u1.SignDate, u2.SignDate));
+                    break;
+                case 4:
+                    userInfos.Sort((u1, u2) => DateTime.Compare(u2.SignDate, u1.SignDate));
+                    break;
+                case 5:
+                    userInfos.Sort((u1, u2) => string.Compare(u1.Nickname, u2.Nickname, StringComparison.Ordinal));
+                    break;
+                case 6:
+                    userInfos.Sort((u1, u2) => string.Compare(u2.Nickname, u1.Nickname, StringComparison.Ordinal));
+                    break;
             }
 
             if (offset <= totalCount)
@@ -79,6 +119,14 @@ namespace BSDN_API.Controllers
             }
             else
             {
+                userInfos = userInfos.Select(ui =>
+                {
+                    ui.UserFollowerCount = _context.UserFollows.Count(uf => uf.FollowingId == ui.UserId);
+                    ui.UserFollowingCount = _context.UserFollows.Count(uf => uf.FollowerId == ui.UserId);
+                    ui.ArticleCount = _context.Articles.Count(a => a.UserId == ui.UserId);
+                    return ui;
+                }).ToList();
+
                 result = new ModelResultList<UserInfo>(200, userInfos,
                     null, hasNext, totalCount, nextUrl);
             }
@@ -87,20 +135,24 @@ namespace BSDN_API.Controllers
         }
 
         // GET api/user/{user id}
-        // TODO: 关注人数、被关注人数
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            ModelResult<User> result;
+            ModelResult<UserInfo> result;
             var userResult = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserId == id);
             if (userResult == null)
             {
-                result = new ModelResult<User>(404, null, "User Not Exists");
+                result = new ModelResult<UserInfo>(404, null, "User Not Exists");
                 return BadRequest(result);
             }
 
-            result = new ModelResult<User>(200, userResult, "User Exists");
+            UserInfo userInfo = new UserInfo(userResult);
+            userInfo.UserFollowerCount = _context.UserFollows.Count(uf => uf.FollowingId == userInfo.UserId);
+            userInfo.UserFollowingCount = _context.UserFollows.Count(uf => uf.FollowerId == userInfo.UserId);
+            userInfo.ArticleCount = _context.Articles.Count(a => a.UserId == userInfo.UserId);
+
+            result = new ModelResult<UserInfo>(200, userInfo, "User Exists");
             return Ok(result);
         }
 
@@ -169,7 +221,11 @@ namespace BSDN_API.Controllers
                 return BadRequest(result);
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            userResult.Email = user.Email;
+            userResult.Nickname = user.Nickname;
+            userResult.PasswordHash = user.PasswordHash;
+
+            _context.Entry(userResult).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             result = new ModelResult<User>(200, null, "User Modified");

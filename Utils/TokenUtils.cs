@@ -46,6 +46,7 @@ namespace BSDN_API.Utils
                 }
                 else
                 {
+                    // 有效
                     result = null;
                 }
             }
