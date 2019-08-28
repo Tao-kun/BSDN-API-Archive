@@ -14,10 +14,10 @@ user_data["passwordHash"]=str(passwordHash.digest().hex())
 #print(passwordHash.digest().hex())
 
 article_data=dict(
-	title="Hello, World 4",
-	content="This is the 4th article of this system"
+	title="Hello, World 5",
+	content="This is the 5th article of this system\n一个含有中文的博文"
 )
-
+print(json.dumps(article_data))
 
 r=requests.post("http://127.0.0.1:5000/api/session",headers=headers,data=json.dumps(user_data))
 print(r.text)
