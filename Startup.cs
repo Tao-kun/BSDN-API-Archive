@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace BSDN_API
 {
@@ -28,7 +29,15 @@ namespace BSDN_API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BSDNContext>(
-                options => options.UseMySql(Configuration.GetConnectionString("BSDNContext"))
+                options => options
+                    .UseMySql(Configuration
+                            .GetConnectionString("BSDNContext"),
+                        mysqlOption =>
+                        {
+                            mysqlOption
+                                .AnsiCharSet(CharSet.Utf8mb4)
+                                .UnicodeCharSet(CharSet.Utf8mb4);
+                        })
             );
             services.AddCors(
                 options =>
