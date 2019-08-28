@@ -96,7 +96,8 @@ namespace BSDN_API.Controllers
             string nextUrl;
             if (hasNext)
             {
-                nextUrl = $@"/api/article?id={userId}&keyword={keyword}&tag={tagId}&offset={limit + offset}&limit={limit}";
+                nextUrl =
+                    $@"/api/article?id={userId}&keyword={keyword}&tag={tagId}&offset={limit + offset}&limit={limit}";
             }
             else
             {
@@ -217,7 +218,6 @@ namespace BSDN_API.Controllers
                 .FirstOrDefaultAsync(s => s.SessionToken == token);
             article.User = await _context.Users
                 .FirstOrDefaultAsync(u => u.UserId == sessionResult.SessionUserId);
-            article.UserId = article.User.UserId;
 
             if (article.PublishDate == DateTime.MinValue)
             {
@@ -286,10 +286,10 @@ namespace BSDN_API.Controllers
             return Ok(result);
         }
 
-        // DELETE api/article/{id}?token={token}
-        [HttpDelete("id")]
+        // DELETE api/article?id={article id}?token={token}
+        [HttpDelete]
         public async Task<IActionResult> Delete(
-            int id,
+            [FromQuery(Name = "id")] int id,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<Article> result = TokenUtils.CheckToken<Article>(token, _context);
@@ -307,7 +307,7 @@ namespace BSDN_API.Controllers
             }
 
             User userResult = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId == articleResult.User.UserId);
+                .FirstOrDefaultAsync(u => u.UserId == articleResult.UserId);
             Session sessionResult = await _context.Sessions
                 .FirstOrDefaultAsync(s => s.SessionToken == token);
             if (userResult == null ||

@@ -181,9 +181,9 @@ namespace BSDN_API.Controllers
             }
         }
 
-        // DELETE api/comment/{comment id}?token={token}
+        // DELETE api/comment?id={comment id}&token={token}
         public async Task<IActionResult> Delete(
-            int id,
+            [FromQuery(Name = "id")] int id,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<CommentInfo> result = TokenUtils.CheckToken<CommentInfo>(token, _context);
@@ -196,6 +196,7 @@ namespace BSDN_API.Controllers
                 .FirstOrDefaultAsync(s => s.SessionToken == token);
             Comment commentResult = await _context.Comments
                 .FirstOrDefaultAsync(c => c.CommentId == id);
+            
             if (commentResult == null)
             {
                 result = new ModelResult<CommentInfo>(404, null, "Comment Not Exists");

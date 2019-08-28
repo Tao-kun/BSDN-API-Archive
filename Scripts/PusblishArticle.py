@@ -28,6 +28,10 @@ rjson=r.json()
 token=rjson['data']['sessionToken']
 userId=rjson['data']['sessionUserId']
 
-r=requests.post("http://127.0.0.1:5000/api/article?token={}".format(token),headers=headers,data=json.dumps(article_data))
+#r=requests.post("http://127.0.0.1:5000/api/article?token={}".format(token),headers=headers,data=json.dumps(article_data))
+#print(r.text)
+#print(r.ok)
+
+r=requests.delete("http://127.0.0.1:5000/api/article?id={}&token={}".format(109,token))
 print(r.text)
 print(r.ok)

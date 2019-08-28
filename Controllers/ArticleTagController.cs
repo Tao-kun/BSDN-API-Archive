@@ -78,11 +78,11 @@ namespace BSDN_API.Controllers
             return Ok(result);
         }
 
-        // DELETE api/article/{article id}/tag/{tag id}?token={token}
+        // DELETE api/article/{article id}/tag?id={tag id}?token={token}
         [HttpDelete]
         public async Task<IActionResult> Delete(
             int articleId,
-            int tagId,
+            [FromQuery(Name = "id")] int tagId,
             [FromQuery(Name = "token")] string token)
         {
             ModelResult<ArticleTag> result = TokenUtils.CheckToken<ArticleTag>(token, _context);
