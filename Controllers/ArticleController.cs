@@ -93,16 +93,9 @@ namespace BSDN_API.Controllers
             }
 
             bool hasNext = offset + limit < totalCount;
-            string nextUrl;
-            if (hasNext)
-            {
-                nextUrl =
-                    $@"/api/article?id={userId}&keyword={keyword}&tag={tagId}&offset={limit + offset}&limit={limit}";
-            }
-            else
-            {
-                nextUrl = null;
-            }
+            var nextUrl = hasNext
+                ? $@"/api/article?id={userId}&keyword={keyword}&tag={tagId}&offset={limit + offset}&limit={limit}"
+                : null;
 
             articleInfos = articleInfos.Select(ai =>
             {

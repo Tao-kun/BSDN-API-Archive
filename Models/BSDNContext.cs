@@ -6,14 +6,6 @@ using BSDN_API.Models;
 
 namespace BSDN_API.Models
 {
-    public class Session
-    {
-        public int SessionId { set; get; }
-        [MaxLength(512)] public string SessionToken { set; get; }
-        public DateTime ExpiresTime { set; get; }
-        public int SessionUserId { set; get; }
-    }
-
     public class BSDNContext : DbContext
     {
         public BSDNContext(DbContextOptions<BSDNContext> options) : base(options)
@@ -41,6 +33,13 @@ namespace BSDN_API.Models
                 .HasOne(c => c.Article)
                 .WithMany(a => a.Comments)
                 .HasForeignKey(c => c.ArticleId);
+
+            // FK_Comment_CommentReply_Reply
+            modelBuilder.Entity<CommentReply>()
+                .HasKey(cr => new {cr.CommentId, cr.RepliedCommentId});
+            modelBuilder.Entity<CommentReply>()
+                .HasIndex(cr => cr.CommentId)
+                .IsUnique();
 
             // FK_Article_ResourceFile
             modelBuilder.Entity<ResourceFile>()
@@ -87,6 +86,7 @@ namespace BSDN_API.Models
         public DbSet<Tag> Tags { set; get; }
         public DbSet<ArticleTag> ArticleTags { set; get; }
         public DbSet<Comment> Comments { set; get; }
+        public DbSet<CommentReply> CommentReplies { set; get; }
         public DbSet<ResourceFile> ResourceFiles { set; get; }
         public DbSet<Session> Sessions { set; get; }
         public DbSet<UserFollow> UserFollows { set; get; }
