@@ -29,15 +29,13 @@ namespace BSDN_API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<BSDNContext>(
-                options => options
-                    .UseMySql(Configuration
-                            .GetConnectionString("BSDNContext"),
-                        mysqlOption =>
-                        {
-                            mysqlOption
-                                .AnsiCharSet(CharSet.Utf8mb4)
-                                .UnicodeCharSet(CharSet.Utf8mb4);
-                        })
+                options => options.UseMySql(Configuration.GetConnectionString("BSDNContext"),
+                    mysqlOption =>
+                    {
+                        mysqlOption
+                            .AnsiCharSet(CharSet.Utf8mb4)
+                            .UnicodeCharSet(CharSet.Utf8mb4);
+                    })
             );
             services.AddCors(
                 options =>

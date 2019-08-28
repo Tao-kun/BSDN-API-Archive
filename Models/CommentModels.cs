@@ -39,6 +39,9 @@ namespace BSDN_API.Models
         public int ArticleCommentCount { set; get; }
         public int UserId { set; get; }
 
+        public bool IsReply { set; get; }
+        public int RepliedCommentId { set; get; }
+
         public CommentInfo(Comment comment)
         {
             CommentId = comment.CommentId;
@@ -47,6 +50,20 @@ namespace BSDN_API.Models
             ArticleId = comment.ArticleId;
             ArticleCommentCount = default;
             UserId = comment.UserId;
+            IsReply = default;
+            RepliedCommentId = default;
         }
+    }
+
+    public class CommentReply
+    {
+        // 回复
+        public int CommentId { set; get; }
+
+        public Comment Comment { set; get; }
+
+        // 被回复评论
+        public int RepliedCommentId { set; get; }
+        public Comment RepliedCOmment { set; get; }
     }
 }

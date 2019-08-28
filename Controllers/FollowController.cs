@@ -30,7 +30,6 @@ namespace BSDN_API.Controllers
             [FromQuery(Name = "offset")] int offset,
             [FromQuery(Name = "limit")] int limit)
         {
-            // TODO: 排序
             ModelResultList<UserFollowInfo> result;
 
             if (limit == 0)
@@ -50,7 +49,6 @@ namespace BSDN_API.Controllers
             }
 
             List<User> users;
-            List<UserFollowInfo> userFollowInfos;
             if (type == "follower")
             {
                 List<UserFollow> userFollowers = await _context.UserFollows
@@ -77,21 +75,14 @@ namespace BSDN_API.Controllers
                 return BadRequest(result);
             }
 
-            userFollowInfos = users.Select(u => new UserFollowInfo(u)).ToList();
+            var userFollowInfos = users.Select(u => new UserFollowInfo(u)).ToList();
 
             int totalCount = userFollowInfos.Count;
             bool hasNext = offset + limit < totalCount;
 
-            string nextUrl;
-            if (hasNext)
-            {
-                // TODO: impl it
-                nextUrl = $@"/api/follow/{type}?id={id}&offset={limit + offset}&limit={limit}";
-            }
-            else
-            {
-                nextUrl = null;
-            }
+            string nextUrl = hasNext
+                ? $@"/api/follow/{type}?id={id}&offset={limit + offset}&limit={limit}"
+                : null;
 
             if (offset <= totalCount)
             {
@@ -187,15 +178,13 @@ namespace BSDN_API.Controllers
 
             Session sessionResult = await _context.Sessions
                 .FirstOrDefaultAsync(s => s.SessionToken == token);
-            User follower = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId == sessionResult.SessionUserId);
 
             UserFollow userFollowResult = await _context.UserFollows
                 .FirstOrDefaultAsync(uf => uf.FollowingId == id &&
                                            uf.FollowerId == sessionResult.SessionUserId);
             if (userFollowResult == null)
             {
-                result = new ModelResult<UserFollowInfo>(400, null, "User Not Followed");
+                result = new ModelResult<UserFollowInfo>(400, null, "User Follow Not Followed");
                 return BadRequest(result);
             }
 

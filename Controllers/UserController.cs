@@ -65,15 +65,9 @@ namespace BSDN_API.Controllers
 
             bool hasNext = offset + limit < totalCount;
 
-            string nextUrl;
-            if (hasNext)
-            {
-                nextUrl = $@"/api/user?sort={sort}&keyword={keyword}&limit={limit}&offset={limit + offset}";
-            }
-            else
-            {
-                nextUrl = null;
-            }
+            string nextUrl = hasNext
+                ? $@"/api/user?sort={sort}&keyword={keyword}&limit={limit}&offset={limit + offset}"
+                : null;
 
             switch (sort)
             {

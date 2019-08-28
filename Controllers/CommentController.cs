@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BSDN_API.Migrations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BSDN_API.Models;
@@ -58,15 +59,9 @@ namespace BSDN_API.Controllers
             int totalCount = commentInfos.Count;
             bool hasNext = offset + limit < totalCount;
 
-            string nextUrl;
-            if (hasNext)
-            {
-                nextUrl = $@"/api/comment?id={id}&limit={limit}&offset={limit + offset}";
-            }
-            else
-            {
-                nextUrl = null;
-            }
+            var nextUrl = hasNext
+                ? $@"/api/comment?id={id}&limit={limit}&offset={limit + offset}"
+                : null;
 
             if (offset <= totalCount)
             {
@@ -88,7 +83,23 @@ namespace BSDN_API.Controllers
             }
             else
             {
-                commentInfos = commentInfos.ToList();
+                commentInfos = commentInfos.Select(ci =>
+                {
+                    CommentReply commentReply = _context.CommentReplies
+                        .FirstOrDefault(cr => cr.CommentId == ci.CommentId);
+                    if (commentReply != null)
+                    {
+                        ci.IsReply = true;
+                        ci.RepliedCommentId = commentReply.RepliedCommentId;
+                    }
+                    else
+                    {
+                        ci.IsReply = false;
+                        ci.RepliedCommentId = 0;
+                    }
+
+                    return ci;
+                }).ToList();
                 result = new ModelResultList<CommentInfo>(200, commentInfos,
                     null, hasNext, totalCount, nextUrl);
             }
@@ -109,12 +120,26 @@ namespace BSDN_API.Controllers
                 return BadRequest(result);
             }
 
-            result = new ModelResult<CommentInfo>(400, new CommentInfo(commentResult), null);
+            CommentInfo commentInfo = new CommentInfo(commentResult);
+            CommentReply commentReply = await _context.CommentReplies
+                .FirstOrDefaultAsync(cr => cr.CommentId == commentInfo.CommentId);
+            if (commentReply != null)
+            {
+                commentInfo.IsReply = true;
+                commentInfo.RepliedCommentId = commentReply.RepliedCommentId;
+            }
+            else
+            {
+                commentInfo.IsReply = false;
+                commentInfo.RepliedCommentId = 0;
+            }
+
+            result = new ModelResult<CommentInfo>(400, commentInfo, null);
             return Ok(result);
         }
 
         // POST api/comment/article/{article id}?token={token}
-        // TODO: POST api/comment/reply/{comment id}?token={token}
+        // POST api/comment/reply/{comment id}?token={token}
         [HttpPost("{type}/{id}")]
         public async Task<IActionResult> Post(
             string type,
@@ -126,6 +151,7 @@ namespace BSDN_API.Controllers
             // 再检查Token是否有效
             // 再检查评论类型
             // 再检查文章/评论是否存在
+            int replyCommentId = 0;
             ModelResult<CommentInfo> result = TokenUtils.CheckToken<CommentInfo>(token, _context);
             if (result != null)
             {
@@ -140,22 +166,39 @@ namespace BSDN_API.Controllers
 
             comment.PublishDate = DateTime.Now;
 
-            if (type == "reply")
+            if (type == "article" || type == "reply")
             {
-                // TODO: impl it
-                return BadRequest("UnImplemented");
-            }
-            else if (type == "article")
-            {
-                if (comment.ArticleId == 0)
-                    comment.ArticleId = id;
-                if (id == 0)
-                    id = comment.ArticleId;
+                Article articleResult;
+                if (type == "article")
+                {
+                    if (comment.ArticleId == 0)
+                        comment.ArticleId = id;
+                    if (id == 0)
+                        id = comment.ArticleId;
+
+                    articleResult = await _context.Articles
+                        .FirstOrDefaultAsync(a => a.ArticleId == id);
+                }
+                else // if (type == "reply")
+                {
+                    Comment commentResult = await _context.Comments
+                        .FirstOrDefaultAsync(c => c.CommentId == id);
+                    if (commentResult == null)
+                    {
+                        result = new ModelResult<CommentInfo>(404, null, "Comment to Reply Not Exists");
+                        return BadRequest(result);
+                    }
+
+                    replyCommentId = commentResult.CommentId;
+                    articleResult = await _context.Articles
+                        .FirstOrDefaultAsync(a => a.ArticleId == commentResult.ArticleId);
+
+                    comment.ArticleId = articleResult.ArticleId;
+                }
 
                 Session sessionResult = await _context.Sessions
                     .FirstOrDefaultAsync(s => s.SessionToken == token);
-                Article articleResult = await _context.Articles
-                    .FirstOrDefaultAsync(a => a.ArticleId == id);
+
                 if (articleResult == null)
                 {
                     result = new ModelResult<CommentInfo>(404, null, "Article Not Exists");
@@ -172,13 +215,25 @@ namespace BSDN_API.Controllers
                 await _context.AddAsync(comment);
                 await _context.SaveChangesAsync();
                 result = new ModelResult<CommentInfo>(201, new CommentInfo(comment), "Commented");
-                return Ok(result);
             }
             else
             {
                 result = new ModelResult<CommentInfo>(405, null, "Undefined Comment Type");
                 return BadRequest(result);
             }
+
+            if (type == "reply" && replyCommentId != 0)
+            {
+                await _context.AddAsync(new CommentReply
+                {
+                    CommentId = comment.CommentId,
+                    RepliedCommentId = replyCommentId
+                });
+                await _context.SaveChangesAsync();
+                result.Message = "Replied";
+            }
+
+            return Ok(result);
         }
 
         // DELETE api/comment?id={comment id}&token={token}
@@ -196,7 +251,7 @@ namespace BSDN_API.Controllers
                 .FirstOrDefaultAsync(s => s.SessionToken == token);
             Comment commentResult = await _context.Comments
                 .FirstOrDefaultAsync(c => c.CommentId == id);
-            
+
             if (commentResult == null)
             {
                 result = new ModelResult<CommentInfo>(404, null, "Comment Not Exists");
