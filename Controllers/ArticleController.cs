@@ -201,7 +201,6 @@ namespace BSDN_API.Controllers
             [FromBody] Article article,
             [FromQuery(Name = "token")] string token)
         {
-            // TODO: Add Notice 
             ModelResult<ArticleInfo> result = TokenUtils.CheckToken<ArticleInfo>(token, _context);
             if (result != null)
             {
@@ -233,6 +232,8 @@ namespace BSDN_API.Controllers
 
             _context.Articles.Add(article);
             await _context.SaveChangesAsync();
+
+            await NoticeUtils.CreateArticleNotice(article, _context);
 
             result = new ModelResult<ArticleInfo>(201, new ArticleInfo(article, _context), "Article Created");
             return Ok(result);

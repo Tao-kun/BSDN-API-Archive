@@ -153,6 +153,8 @@ namespace BSDN_API.Controllers
             // 再检查评论类型
             // 再检查文章/评论是否存在
             int replyCommentId = 0;
+            Comment commentResult = null;
+
             ModelResult<CommentInfo> result = TokenUtils.CheckToken<CommentInfo>(token, _context);
             if (result != null)
             {
@@ -182,7 +184,7 @@ namespace BSDN_API.Controllers
                 }
                 else // if (type == "reply")
                 {
-                    Comment commentResult = await _context.Comments
+                    commentResult = await _context.Comments
                         .FirstOrDefaultAsync(c => c.CommentId == id);
                     if (commentResult == null)
                     {
@@ -215,6 +217,7 @@ namespace BSDN_API.Controllers
 
                 await _context.AddAsync(comment);
                 await _context.SaveChangesAsync();
+
                 result = new ModelResult<CommentInfo>(201, new CommentInfo(comment), "Commented");
             }
             else
@@ -233,6 +236,19 @@ namespace BSDN_API.Controllers
                 await _context.SaveChangesAsync();
                 result.Message = "Replied";
             }
+
+            int noticeUserId = 0;
+            if (type == "article")
+            {
+                noticeUserId = comment.UserId;
+            }
+            else
+            {
+                if (commentResult != null)
+                    noticeUserId = commentResult.UserId;
+            }
+
+            await NoticeUtils.CreateCommentNotice(comment, _context, noticeUserId, type);
 
             return Ok(result);
         }

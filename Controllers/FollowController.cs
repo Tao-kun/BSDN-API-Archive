@@ -161,6 +161,8 @@ namespace BSDN_API.Controllers
             _context.Add(userFollow);
             await _context.SaveChangesAsync();
 
+            NoticeUtils.CreateFollowNotice(userFollow,_context);
+
             result = new ModelResult<UserFollowInfo>(201, null, "Add Follow Success");
             return Ok(result);
         }
