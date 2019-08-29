@@ -13,6 +13,8 @@ namespace BSDN_API.Models
         [MaxLength(256)] string Email { set; get; }
         [MaxLength(256)] string PasswordHash { set; get; }
         [MaxLength(256)] string Nickname { set; get; }
+        [MaxLength(512)] string Intro { set; get; }
+        [MaxLength(512)] string AvatarUrl { set; get; }
         DateTime SignDate { set; get; }
     }
 
@@ -24,6 +26,8 @@ namespace BSDN_API.Models
         [MaxLength(256)] public string PasswordHash { set; get; }
         [MaxLength(256)] public string Nickname { set; get; }
         public DateTime SignDate { set; get; }
+        [MaxLength(512)] public string Intro { get; set; }
+        [MaxLength(512)] public string AvatarUrl { get; set; }
 
         public List<Article> Articles { set; get; }
         public List<UserFollow> UserFollowers { set; get; }
@@ -38,6 +42,8 @@ namespace BSDN_API.Models
         [MaxLength(256)] public string PasswordHash { set; get; }
         [MaxLength(256)] public string Nickname { set; get; }
         public DateTime SignDate { set; get; }
+        [MaxLength(512)] public string Intro { get; set; }
+        [MaxLength(512)] public string AvatarUrl { get; set; }
 
         public int ArticleCount { set; get; }
         public int UserFollowerCount { set; get; }
@@ -53,6 +59,8 @@ namespace BSDN_API.Models
             ArticleCount = user.Articles?.Count ?? 0;
             UserFollowerCount = default;
             UserFollowingCount = default;
+            AvatarUrl = user.AvatarUrl;
+            Intro = Intro;
         }
     }
 
