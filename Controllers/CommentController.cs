@@ -147,6 +147,7 @@ namespace BSDN_API.Controllers
             [FromBody] Comment comment,
             [FromQuery(Name = "token")] string token)
         {
+            // TODO: Add Notice
             // 先评论是否有正文
             // 再检查Token是否有效
             // 再检查评论类型

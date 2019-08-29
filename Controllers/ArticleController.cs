@@ -201,6 +201,7 @@ namespace BSDN_API.Controllers
             [FromBody] Article article,
             [FromQuery(Name = "token")] string token)
         {
+            // TODO: Add Notice 
             ModelResult<ArticleInfo> result = TokenUtils.CheckToken<ArticleInfo>(token, _context);
             if (result != null)
             {

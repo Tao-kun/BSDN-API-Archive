@@ -90,5 +90,6 @@ namespace BSDN_API.Models
         public DbSet<ResourceFile> ResourceFiles { set; get; }
         public DbSet<Session> Sessions { set; get; }
         public DbSet<UserFollow> UserFollows { set; get; }
+        public DbSet<Notice> Notices { set; get; }
     }
 }
