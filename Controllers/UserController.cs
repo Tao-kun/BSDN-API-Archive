@@ -218,6 +218,8 @@ namespace BSDN_API.Controllers
             userResult.Email = user.Email;
             userResult.Nickname = user.Nickname;
             userResult.PasswordHash = user.PasswordHash;
+            userResult.AvatarUrl = user.AvatarUrl;
+            userResult.Intro = user.Intro;
 
             _context.Entry(userResult).State = EntityState.Modified;
             await _context.SaveChangesAsync();
