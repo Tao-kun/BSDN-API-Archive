@@ -126,7 +126,6 @@ namespace BSDN_API.Controllers
             int id,
             [FromQuery(Name = "token")] string token)
         {
-            // TODO: Add Notice
             ModelResult<UserFollowInfo> result = TokenUtils.CheckToken<UserFollowInfo>(token, _context);
             if (result != null)
             {
