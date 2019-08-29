@@ -3,14 +3,16 @@ using System;
 using BSDN_API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BSDN_API.Migrations
 {
     [DbContext(typeof(BSDNContext))]
-    partial class BSDNContextModelSnapshot : ModelSnapshot
+    [Migration("20190829011101_Intro and Avatar")]
+    partial class IntroandAvatar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -149,14 +151,12 @@ namespace BSDN_API.Migrations
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AvatarUrl")
-                        .HasMaxLength(512);
+                    b.Property<string>("AvatarUrl");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
-                    b.Property<string>("Intro")
-                        .HasMaxLength(512);
+                    b.Property<string>("Intro");
 
                     b.Property<string>("Nickname")
                         .HasMaxLength(256);
