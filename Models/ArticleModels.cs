@@ -27,7 +27,6 @@ namespace BSDN_API.Models
 
         public List<ArticleTag> ArticleTags { set; get; }
         public List<Comment> Comments { set; get; }
-        public List<ResourceFile> ResourceFiles { set; get; }
 
         // FK_User_Article
         public int UserId { set; get; }
@@ -44,7 +43,6 @@ namespace BSDN_API.Models
 
         public List<TagInfo> TagInfos { set; get; }
         public int CommentCount { set; get; }
-        public int ResourceFileCount { set; get; }
 
         public int UserId { set; get; }
         public string NickName { set; get; }
@@ -70,19 +68,8 @@ namespace BSDN_API.Models
             }
 
             CommentCount = article.Comments?.Count ?? 0;
-            ResourceFileCount = article.ResourceFiles?.Count ?? 0;
             UserId = article.UserId;
             NickName = article.User?.Nickname;
         }
-    }
-
-    public class ResourceFile
-    {
-        public int ResourceFileId { set; get; }
-        [MaxLength(512)] public string Filename { set; get; }
-
-        // FK_Article_ResourceFile
-        public int ArticleId { set; get; }
-        public Article Article { set; get; }
     }
 }

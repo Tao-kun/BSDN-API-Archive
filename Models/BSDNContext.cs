@@ -41,12 +41,6 @@ namespace BSDN_API.Models
                 .HasIndex(cr => cr.CommentId)
                 .IsUnique();
 
-            // FK_Article_ResourceFile
-            modelBuilder.Entity<ResourceFile>()
-                .HasOne(rf => rf.Article)
-                .WithMany(a => a.ResourceFiles)
-                .HasForeignKey(rf => rf.ArticleId);
-
             // FK_Article_ArticleTag_Tag
             modelBuilder.Entity<ArticleTag>()
                 .HasKey(at => new {at.ArticleId, at.TagId});
@@ -87,7 +81,6 @@ namespace BSDN_API.Models
         public DbSet<ArticleTag> ArticleTags { set; get; }
         public DbSet<Comment> Comments { set; get; }
         public DbSet<CommentReply> CommentReplies { set; get; }
-        public DbSet<ResourceFile> ResourceFiles { set; get; }
         public DbSet<Session> Sessions { set; get; }
         public DbSet<UserFollow> UserFollows { set; get; }
         public DbSet<Notice> Notices { set; get; }
