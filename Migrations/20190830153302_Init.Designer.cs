@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSDN_API.Migrations
 {
     [DbContext(typeof(BSDNContext))]
-    [Migration("20190829011101_Intro and Avatar")]
-    partial class IntroandAvatar
+    [Migration("20190830153302_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -93,21 +93,24 @@ namespace BSDN_API.Migrations
                     b.ToTable("CommentReplies");
                 });
 
-            modelBuilder.Entity("BSDN_API.Models.ResourceFile", b =>
+            modelBuilder.Entity("BSDN_API.Models.Notice", b =>
                 {
-                    b.Property<int>("ResourceFileId")
+                    b.Property<int>("NoticeId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("ArticleId");
+                    b.Property<DateTime>("AddTime");
 
-                    b.Property<string>("Filename")
+                    b.Property<string>("ApiUrl")
                         .HasMaxLength(512);
 
-                    b.HasKey("ResourceFileId");
+                    b.Property<string>("NoticeData")
+                        .HasMaxLength(1024);
 
-                    b.HasIndex("ArticleId");
+                    b.Property<int>("UserId");
 
-                    b.ToTable("ResourceFiles");
+                    b.HasKey("NoticeId");
+
+                    b.ToTable("Notices");
                 });
 
             modelBuilder.Entity("BSDN_API.Models.Session", b =>
@@ -146,17 +149,37 @@ namespace BSDN_API.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("BSDN_API.Models.UploadFile", b =>
+                {
+                    b.Property<int>("UploadFileId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("FileName")
+                        .HasMaxLength(1024);
+
+                    b.Property<int>("UploaderId");
+
+                    b.HasKey("UploadFileId");
+
+                    b.HasIndex("FileName")
+                        .IsUnique();
+
+                    b.ToTable("UploadFiles");
+                });
+
             modelBuilder.Entity("BSDN_API.Models.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AvatarUrl");
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(512);
 
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
-                    b.Property<string>("Intro");
+                    b.Property<string>("Intro")
+                        .HasMaxLength(512);
 
                     b.Property<string>("Nickname")
                         .HasMaxLength(256);
@@ -234,14 +257,6 @@ namespace BSDN_API.Migrations
                     b.HasOne("BSDN_API.Models.Comment", "RepliedCOmment")
                         .WithMany()
                         .HasForeignKey("RepliedCommentId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("BSDN_API.Models.ResourceFile", b =>
-                {
-                    b.HasOne("BSDN_API.Models.Article", "Article")
-                        .WithMany("ResourceFiles")
-                        .HasForeignKey("ArticleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

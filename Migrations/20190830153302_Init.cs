@@ -4,10 +4,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BSDN_API.Migrations
 {
-    public partial class ReReReInit : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Notices",
+                columns: table => new
+                {
+                    NoticeId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(nullable: false),
+                    AddTime = table.Column<DateTime>(nullable: false),
+                    NoticeData = table.Column<string>(maxLength: 1024, nullable: true),
+                    ApiUrl = table.Column<string>(maxLength: 512, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notices", x => x.NoticeId);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Sessions",
                 columns: table => new
@@ -37,6 +53,20 @@ namespace BSDN_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UploadFiles",
+                columns: table => new
+                {
+                    UploadFileId = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FileName = table.Column<string>(maxLength: 1024, nullable: true),
+                    UploaderId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UploadFiles", x => x.UploadFileId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -45,7 +75,9 @@ namespace BSDN_API.Migrations
                     Email = table.Column<string>(maxLength: 256, nullable: true),
                     PasswordHash = table.Column<string>(maxLength: 256, nullable: true),
                     Nickname = table.Column<string>(maxLength: 256, nullable: true),
-                    SignDate = table.Column<DateTime>(nullable: false)
+                    SignDate = table.Column<DateTime>(nullable: false),
+                    Intro = table.Column<string>(maxLength: 512, nullable: true),
+                    AvatarUrl = table.Column<string>(maxLength: 512, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -152,22 +184,26 @@ namespace BSDN_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ResourceFiles",
+                name: "CommentReplies",
                 columns: table => new
                 {
-                    ResourceFileId = table.Column<int>(nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Filename = table.Column<string>(maxLength: 512, nullable: true),
-                    ArticleId = table.Column<int>(nullable: false)
+                    CommentId = table.Column<int>(nullable: false),
+                    RepliedCommentId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ResourceFiles", x => x.ResourceFileId);
+                    table.PrimaryKey("PK_CommentReplies", x => new { x.CommentId, x.RepliedCommentId });
                     table.ForeignKey(
-                        name: "FK_ResourceFiles_Articles_ArticleId",
-                        column: x => x.ArticleId,
-                        principalTable: "Articles",
-                        principalColumn: "ArticleId",
+                        name: "FK_CommentReplies_Comments_CommentId",
+                        column: x => x.CommentId,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CommentReplies_Comments_RepliedCommentId",
+                        column: x => x.RepliedCommentId,
+                        principalTable: "Comments",
+                        principalColumn: "CommentId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -182,6 +218,17 @@ namespace BSDN_API.Migrations
                 column: "TagId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CommentReplies_CommentId",
+                table: "CommentReplies",
+                column: "CommentId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CommentReplies_RepliedCommentId",
+                table: "CommentReplies",
+                column: "RepliedCommentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comments_ArticleId",
                 table: "Comments",
                 column: "ArticleId");
@@ -190,11 +237,6 @@ namespace BSDN_API.Migrations
                 name: "IX_Comments_UserId",
                 table: "Comments",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ResourceFiles_ArticleId",
-                table: "ResourceFiles",
-                column: "ArticleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Sessions_SessionToken",
@@ -206,6 +248,12 @@ namespace BSDN_API.Migrations
                 name: "IX_Tags_TagName",
                 table: "Tags",
                 column: "TagName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UploadFiles_FileName",
+                table: "UploadFiles",
+                column: "FileName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -232,19 +280,25 @@ namespace BSDN_API.Migrations
                 name: "ArticleTags");
 
             migrationBuilder.DropTable(
-                name: "Comments");
+                name: "CommentReplies");
 
             migrationBuilder.DropTable(
-                name: "ResourceFiles");
+                name: "Notices");
 
             migrationBuilder.DropTable(
                 name: "Sessions");
+
+            migrationBuilder.DropTable(
+                name: "UploadFiles");
 
             migrationBuilder.DropTable(
                 name: "UserFollows");
 
             migrationBuilder.DropTable(
                 name: "Tags");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Articles");

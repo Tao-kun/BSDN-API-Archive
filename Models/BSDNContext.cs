@@ -88,6 +88,6 @@ namespace BSDN_API.Models
         public DbSet<Session> Sessions { set; get; }
         public DbSet<UserFollow> UserFollows { set; get; }
         public DbSet<Notice> Notices { set; get; }
-        public DbSet<UploadFile> Files { set; get; }
+        public DbSet<UploadFile> UploadFiles { set; get; }
     }
 }

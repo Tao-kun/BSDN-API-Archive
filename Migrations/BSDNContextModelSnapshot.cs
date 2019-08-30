@@ -162,7 +162,7 @@ namespace BSDN_API.Migrations
                     b.HasIndex("FileName")
                         .IsUnique();
 
-                    b.ToTable("Files");
+                    b.ToTable("UploadFiles");
                 });
 
             modelBuilder.Entity("BSDN_API.Models.User", b =>
