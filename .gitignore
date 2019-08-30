@@ -34,3 +34,6 @@ msbuild.wrn
 
 # User Modified
 Scripts/Temp/
+
+data/*
+!data/.gitkeep

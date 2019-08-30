@@ -72,6 +72,10 @@ namespace BSDN_API.Models
             modelBuilder.Entity<Session>()
                 .HasIndex(s => s.SessionToken)
                 .IsUnique();
+
+            modelBuilder.Entity<UploadFile>()
+                .HasIndex(f => f.FileName)
+                .IsUnique();
         }
 
         // DbSet
@@ -84,5 +88,6 @@ namespace BSDN_API.Models
         public DbSet<Session> Sessions { set; get; }
         public DbSet<UserFollow> UserFollows { set; get; }
         public DbSet<Notice> Notices { set; get; }
+        public DbSet<UploadFile> Files { set; get; }
     }
 }
