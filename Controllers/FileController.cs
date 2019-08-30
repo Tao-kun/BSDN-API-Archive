@@ -78,7 +78,7 @@ namespace BSDN_API.Controllers
                 });
                 await _context.SaveChangesAsync();
 
-                result = new ModelResult<string>(200, $@"/file/{filename}", null);
+                result = new ModelResult<string>(200, $@"/file/{filename}{extension}", null);
                 return Ok(result);
             }
             else
