@@ -120,6 +120,31 @@ namespace BSDN_API.Controllers
             return Ok(result);
         }
 
+        // GET api/follow/check/{user id}?token={token}
+        [HttpGet("check/{id}")]
+        public async Task<IActionResult> Get(int id, [FromQuery(Name = "token")] string token)
+        {
+            ModelResult<UserFollowInfo> result = TokenUtils.CheckToken<UserFollowInfo>(token, _context);
+            if (result != null)
+            {
+                return BadRequest(result);
+            }
+
+            Session sessionResult = await _context.Sessions
+                .FirstOrDefaultAsync(s => s.SessionToken == token);
+
+            UserFollow userFollowResult = await _context.UserFollows
+                .FirstOrDefaultAsync(uf => uf.FollowingId == id &&
+                                           uf.FollowerId == sessionResult.SessionUserId);
+            return Ok(
+                new
+                {
+                    status = 200,
+                    isFollowing = (userFollowResult == null)
+                }
+            );
+        }
+
         // POST api/follow/{user id}token={token}
         [HttpPost("{id}")]
         public async Task<IActionResult> Post(
