@@ -147,7 +147,13 @@ namespace BSDN_API.Controllers
             }
 
             User following = await _context.Users
-                .FirstOrDefaultAsync(u => u.UserId == userFollowResult.FollowingId);
+                .FirstOrDefaultAsync(u => u.UserId == id);
+
+            if (following == null)
+            {
+                result = new ModelResult<UserFollowInfo>(404, null, "User Not Exists");
+                return BadRequest(result);
+            }
 
             UserFollow userFollow = new UserFollow
             {
@@ -160,7 +166,7 @@ namespace BSDN_API.Controllers
             _context.Add(userFollow);
             await _context.SaveChangesAsync();
 
-            NoticeUtils.CreateFollowNotice(userFollow,_context);
+            await NoticeUtils.CreateFollowNotice(userFollow, _context);
 
             result = new ModelResult<UserFollowInfo>(201, null, "Add Follow Success");
             return Ok(result);
