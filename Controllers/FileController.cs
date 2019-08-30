@@ -71,12 +71,17 @@ namespace BSDN_API.Controllers
                     await _context.Users.FirstOrDefaultAsync(u => u.UserId == sessionResult.SessionUserId);
                 int userId = userResult.UserId;
 
-                await _context.Files.AddAsync(new UploadFile
+                UploadFile uploadFileResult = await _context.Files
+                    .FirstOrDefaultAsync(f => f.FileName == $@"{filename}{extension}");
+                if (uploadFileResult == null)
                 {
-                    FileName = filename,
-                    UploaderId = userId
-                });
-                await _context.SaveChangesAsync();
+                    await _context.Files.AddAsync(new UploadFile
+                    {
+                        FileName = $@"{filename}{extension}",
+                        UploaderId = userId
+                    });
+                    await _context.SaveChangesAsync();
+                }
 
                 result = new ModelResult<string>(200, $@"/file/{filename}{extension}", null);
                 return Ok(result);
