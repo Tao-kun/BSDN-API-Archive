@@ -140,7 +140,7 @@ namespace BSDN_API.Controllers
                 new
                 {
                     status = 200,
-                    isFollowing = (userFollowResult == null)
+                    isFollowing = (userFollowResult != null)
                 }
             );
         }
@@ -217,7 +217,7 @@ namespace BSDN_API.Controllers
                                            uf.FollowerId == sessionResult.SessionUserId);
             if (userFollowResult == null)
             {
-                result = new ModelResult<UserFollowInfo>(400, null, "User Follow Not Followed");
+                result = new ModelResult<UserFollowInfo>(400, null, "User Not Followed");
                 return BadRequest(result);
             }
 
