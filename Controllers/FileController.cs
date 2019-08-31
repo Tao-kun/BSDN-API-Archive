@@ -43,23 +43,11 @@ namespace BSDN_API.Controllers
                     Directory.CreateDirectory(uploadFolder);
                 }
 
-                MemoryStream ms = new MemoryStream();
-                file.OpenReadStream().CopyTo(ms);
-
-                MD5 md5 = MD5.Create();
-                byte[] data = md5.ComputeHash(ms);
-                StringBuilder stringBuilder = new StringBuilder();
-                foreach (var ch in data)
-                {
-                    stringBuilder.Append(ch.ToString("x2"));
-                }
-
-                string hash = stringBuilder.ToString();
-
-                string filename = $@"{hash}";
+                string hash = FileHash(file);
                 string extension = Path.GetExtension(file.FileName);
+                string filename = $@"{hash}{extension}";
 
-                string filePath = $@"{uploadFolder}/{filename}{extension}";
+                string filePath = $@"{uploadFolder}/{filename}";
                 using (FileStream fs = System.IO.File.Create(filePath))
                 {
                     file.CopyTo(fs);
@@ -72,18 +60,18 @@ namespace BSDN_API.Controllers
                 int userId = userResult.UserId;
 
                 UploadFile uploadFileResult = await _context.UploadFiles
-                    .FirstOrDefaultAsync(f => f.FileName == $@"{filename}{extension}");
+                    .FirstOrDefaultAsync(f => f.FileName == $@"{filename}");
                 if (uploadFileResult == null)
                 {
                     await _context.UploadFiles.AddAsync(new UploadFile
                     {
-                        FileName = $@"{filename}{extension}",
+                        FileName = $@"{filename}",
                         UploaderId = userId
                     });
                     await _context.SaveChangesAsync();
                 }
 
-                result = new ModelResult<string>(200, $@"/file/{filename}{extension}", null);
+                result = new ModelResult<string>(200, $@"/file/{filename}", null);
                 return Ok(result);
             }
             else
@@ -91,6 +79,15 @@ namespace BSDN_API.Controllers
                 result = new ModelResult<string>(400, null, "Empty File");
                 return BadRequest(result);
             }
+        }
+
+        private string FileHash(IFormFile file)
+        {
+            MemoryStream stream = new MemoryStream();
+            file.OpenReadStream().CopyTo(stream);
+
+            byte[] bytes = MD5.Create().ComputeHash(stream.ToArray());
+            return BitConverter.ToString(bytes).Replace("-", string.Empty).ToLower();
         }
     }
 }

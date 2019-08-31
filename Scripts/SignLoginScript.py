@@ -6,8 +6,8 @@ headers = {'Content-type': 'application/json'}
 SALT="BSDN"
 
 user_data=dict(
-	email="test4@example.com",
-	nickname="Zeer"
+	email="test2@example.com",
+	nickname="Sim"
 )
 
 password="example_password"

@@ -5,8 +5,8 @@ import hashlib
 headers = {'Content-type': 'application/json'}
 SALT="BSDN"
 user_data=dict(
-	email="test4@example.com",
-	nickname="Zeer"
+	email="test1@example.com",
+	nickname="Amy"
 )
 password="example_password"
 passwordHash=hashlib.md5("{}{}".format(password,SALT).encode())

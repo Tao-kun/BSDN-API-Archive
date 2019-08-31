@@ -6,8 +6,8 @@ import requests
 headers = {'Content-type': 'application/json'}
 SALT = "BSDN"
 user_data=dict(
-    email="test4@example.com",
-    nickname="Zeer"
+    email="test1@example.com",
+    nickname="Amy"
 )
 password = "example_password"
 passwordHash = hashlib.md5("{}{}".format(password, SALT).encode())
@@ -23,7 +23,7 @@ rjson = r.json()
 token = rjson['data']['sessionToken']
 userId = rjson['data']['sessionUserId']
 
-at_list = [(1, 4), (2, 3), (3, 2), (4, 1),(1,2)]
+at_list = [(1, 1), (1,2), (1, 3)]
 
 # add
 for t in at_list:
