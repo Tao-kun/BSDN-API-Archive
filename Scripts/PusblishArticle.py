@@ -14,8 +14,8 @@ user_data["passwordHash"]=str(passwordHash.digest().hex())
 #print(passwordHash.digest().hex())
 
 article_data=dict(
-	title="Hello, World 5",
-	content="This is the 5th article of this system\n一个含有中文的博文"
+	title="Hello, World",
+	content="This is the 1st article of this system\n一个含有中文的博文"
 )
 print(json.dumps(article_data))
 
