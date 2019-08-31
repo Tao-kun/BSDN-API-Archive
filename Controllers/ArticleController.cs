@@ -66,6 +66,7 @@ namespace BSDN_API.Controllers
             }
             else if (keyword != null)
             {
+                keyword = keyword.ToLower();
                 articleQuery = _context.Articles
                     .Where(a => a.Content.Contains(keyword) ||
                                 a.Title.Contains(keyword));

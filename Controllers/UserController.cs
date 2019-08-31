@@ -51,9 +51,12 @@ namespace BSDN_API.Controllers
 
             List<UserInfo> userInfos = await _context.Users.Select(u => new UserInfo(u)).ToListAsync();
             if (keyword != null)
+            {
+                keyword = keyword.ToLower();
                 userInfos = userInfos
-                    .Where(ui => ui.Nickname.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) > 0)
+                    .Where(ui => ui.Nickname.Contains(keyword))
                     .ToList();
+            }
 
             int totalCount = userInfos.Count;
             if (totalCount == 0)
